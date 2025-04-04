@@ -18,10 +18,16 @@
       border-collapse: collapse;
       color: #c7a332;
     }
-    th, td {
+    td {
       padding: 8px;
       text-align: center;
       border: 1px solid #c7a332;
+    }
+    th{
+      padding: 8px;
+      text-align:center;
+      border: 1px solid #c7a332;
+      font-size: 14px;
     }
     input[type="number"] {
       width: 100%;
@@ -56,7 +62,7 @@
       margin: 10px auto;
     }
     button:hover {
-      background-color: #eac96b;
+      background-color: #c7a332;
     }
     footer {
       margin-top: 40px;
@@ -96,7 +102,7 @@
     </thead>
     <tbody id="data-rows">
       <script>
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 8; i++) {
           document.write('<tr>' +
             '<td><input type="number" class="weight" step="0.01" oninput="calculateNetWeight()" onkeydown="focusNext(event)" /></td>' +
             '<td><input type="number" class="purity" step="0.1" oninput="calculateNetWeight()" onkeydown="focusNext(event)" /></td>' +
