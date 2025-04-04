@@ -1,6 +1,6 @@
 {
-  "name": "Alloy Purity Calculator",
-  "short_name": "AlloyCalc",
+  "name": "Bloudan Calculator",
+  "short_name": "Bloudan Calculator",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
