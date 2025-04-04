@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BLOUDAN CALCULATOR</title>
   <style>
     body {
@@ -20,7 +20,7 @@
     }
     th, td {
       padding: 8px;
-      text-align: left;
+      text-align: center;
       border: 1px solid #c7a332;
     }
     input[type="number"] {
@@ -58,6 +58,12 @@
     button:hover {
       background-color: #eac96b;
     }
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #c7a332;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -90,7 +96,11 @@
     <tbody id="data-rows">
       <script>
         for (let i = 0; i < 6; i++) {
-          document.write('<tr><td><input type="number" class="weight" step="0.01" oninput="calculateNetWeight()" /></td><td><input type="number" class="purity" step="0.1" oninput="calculateNetWeight()" /></td><td><input type="number" class="net" readonly /></td></tr>');
+          document.write('<tr>' +
+            '<td><input type="number" class="weight" step="0.01" oninput="calculateNetWeight()" onkeydown="focusNext(event)" /></td>' +
+            '<td><input type="number" class="purity" step="0.1" oninput="calculateNetWeight()" onkeydown="focusNext(event)" /></td>' +
+            '<td><input type="number" class="net" readonly /></td>' +
+            '</tr>');
         }
       </script>
     </tbody>
@@ -102,6 +112,10 @@
       </tr>
     </tfoot>
   </table>
+
+  <footer>
+    Powered by: <strong>BLOUDAN JEWELLERY</strong>
+  </footer>
 
   <script>
     function calculateNetWeight() {
@@ -124,31 +138,33 @@
       document.getElementById('total-weight').value = totalWeight.toFixed(2);
       document.getElementById('total-net').value = totalNet.toFixed(2);
       if (totalWeight > 0) {
-        document.getElementById('avg-purity').value = ((totalNet / totalWeight) * 999).toFixed(1);
+        const avgPurity = (totalNet / totalWeight) * 999;
+        document.getElementById('avg-purity').value = avgPurity.toFixed(1);
       } else {
         document.getElementById('avg-purity').value = '';
       }
 
-      calculateWeightNeeded(); // Recalculate based on updated values
+      calculateWeightNeeded();
     }
 
     function calculateWeightNeeded() {
-      const target = parseFloat(document.getElementById('target-purity').value);
-      const available = parseFloat(document.getElementById('available-purity').value);
-      const totalNet = parseFloat(document.getElementById('total-net').value);
+      const W1 = parseFloat(document.getElementById('total-weight').value);
+      const P1 = parseFloat(document.getElementById('avg-purity').value);
+      const Pt = parseFloat(document.getElementById('target-purity').value);
+      const P2 = parseFloat(document.getElementById('available-purity').value);
 
-      if (!isNaN(target) && !isNaN(available) && available > 0 && !isNaN(totalNet)) {
-        const finalWeight = (totalNet * 999) / target;
-        const availableWeight = (totalNet * 999) / available;
-        const weightNeeded = Math.max(0, finalWeight - availableWeight);
-        document.getElementById('weight-needed').value = weightNeeded.toFixed(2);
+      // Metal weight needed
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && !isNaN(P2) && P2 !== Pt) {
+        const W2 = (W1 * (P1 - Pt) / Pt) * (Pt / (T1 - Pt));
+        document.getElementById('weight-needed').value = W2 > 0 ? W2.toFixed(2) : '0.00';
       } else {
         document.getElementById('weight-needed').value = '';
       }
 
-      if (!isNaN(target) && !isNaN(totalNet)) {
-        const copperNeeded = Math.max(0, ((totalNet * 999) / target) - totalNet);
-        document.getElementById('copper-needed').value = copperNeeded.toFixed(2);
+      // Copper needed (P2 = 0)
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && Pt !== 0) {
+        const copperW = (W1 * (P1 - Pt) / Pt) * (Pt / (T1 - Pt));
+        document.getElementById('copper-needed').value = copperW > 0 ? copperW.toFixed(2) : '0.00';
       } else {
         document.getElementById('copper-needed').value = '';
       }
@@ -165,6 +181,17 @@
 
       document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
       document.querySelectorAll('.net').forEach(net => net.value = '');
+    }
+
+    function focusNext(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const inputs = Array.from(document.querySelectorAll('input'));
+        const index = inputs.indexOf(e.target);
+        if (index > -1 && index + 1 < inputs.length) {
+          inputs[index + 1].focus();
+        }
+      }
     }
   </script>
 </body>
