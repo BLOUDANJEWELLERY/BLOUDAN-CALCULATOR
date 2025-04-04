@@ -27,7 +27,7 @@
       padding: 8px;
       text-align:center;
       border: 1px solid #c7a332;
-      font-size: 14px;
+      font-size: 16px;
     }
     input[type="number"] {
       width: 100%;
@@ -102,7 +102,7 @@
     </thead>
     <tbody id="data-rows">
       <script>
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 6; i++) {
           document.write('<tr>' +
             '<td><input type="number" class="weight" step="0.01" oninput="calculateNetWeight()" onkeydown="focusNext(event)" /></td>' +
             '<td><input type="number" class="purity" step="0.1" oninput="calculateNetWeight()" onkeydown="focusNext(event)" /></td>' +
