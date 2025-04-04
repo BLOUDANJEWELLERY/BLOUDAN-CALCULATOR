@@ -3,7 +3,6 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8" />
-  <link rel="manifest" href="manifest.json">
   <title>BLOUDAN CALCULATOR</title>
   <style>
     body {
@@ -138,14 +137,20 @@
       const available = parseFloat(document.getElementById('available-purity').value);
       const totalNet = parseFloat(document.getElementById('total-net').value);
 
-      if (!isNaN(target) && !isNaN(available) && !isNaN(totalNet)) {
+      if (!isNaN(target) && !isNaN(available) && available > 0 && !isNaN(totalNet)) {
         const finalWeight = (totalNet * 999) / target;
-        const existingWeight = (totalNet * 999) / available;
-        const weightNeeded = finalWeight - existingWeight;
-        const copperNeeded = finalWeight - totalNet;
-
+        const availableWeight = (totalNet * 999) / available;
+        const weightNeeded = Math.max(0, finalWeight - availableWeight);
         document.getElementById('weight-needed').value = weightNeeded.toFixed(2);
+      } else {
+        document.getElementById('weight-needed').value = '';
+      }
+
+      if (!isNaN(target) && !isNaN(totalNet)) {
+        const copperNeeded = Math.max(0, ((totalNet * 999) / target) - totalNet);
         document.getElementById('copper-needed').value = copperNeeded.toFixed(2);
+      } else {
+        document.getElementById('copper-needed').value = '';
       }
     }
 
