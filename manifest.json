@@ -1,5 +1,5 @@
 {
-  "name": "Bloudan Calculator",
+  "name":"Bloudan Calculator",
   "short_name": "Bloudan Calculator",
   "start_url": "index.html",
   "display": "standalone",
