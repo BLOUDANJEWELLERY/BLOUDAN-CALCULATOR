@@ -1,6 +1,6 @@
 {
-  "name":"Bloudan Calculator",
-  "short_name": "Bloudan Calculator",
+  "name": "Bloudan Calculator",
+  "short_name": "BloudanCalc",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
