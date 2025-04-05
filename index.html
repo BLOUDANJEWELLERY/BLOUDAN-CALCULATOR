@@ -78,11 +78,16 @@
       color: #c7a332;
       font-size: 15px;
     }
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
   </style>
 </head>
 <body>
   <h2>BLOUDAN CALCULATOR</h2>
-  <button onclick="clearAll()">AC</button>
+  <button onclick="clearAll()">Clear All</button>
 
   <div class="input-section">
     <label>Target Purity:
@@ -99,7 +104,7 @@
     </label>
   </div>
 
-  <table>
+  <table id="data-table">
     <thead>
       <tr>
         <th>Weight</th>
@@ -108,15 +113,7 @@
       </tr>
     </thead>
     <tbody id="data-rows">
-      <script>
-        for (let i = 0; i < 6; i++) {
-          document.write('<tr>' +
-            `<td><input type="number" class="weight" id="weight-${i + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${i + 1}')"/></td>` +
-            `<td><input type="number" class="purity" id="purity-${i + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${i + 2}')"/></td>` +
-            '<td><input type="number" class="net result" readonly /></td>' +
-            '</tr>');
-        }
-      </script>
+      <!-- Initial 6 rows will be dynamically added using script -->
     </tbody>
     <tfoot>
       <tr>
@@ -127,11 +124,36 @@
     </tfoot>
   </table>
 
+  <div class="action-buttons">
+    <button onclick="addRow()">+</button>
+    <button onclick="removeRow()">-</button>
+  </div>
+
   <footer>
     Powered by: <strong>BLOUDAN JEWELLERY</strong>
   </footer>
 
   <script>
+    function addRow() {
+      const tableBody = document.getElementById("data-rows");
+      const rowCount = tableBody.rows.length;
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
+        <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
+        <td><input type="number" class="net result" readonly /></td>
+      `;
+      tableBody.appendChild(row);
+    }
+
+    function removeRow() {
+      const tableBody = document.getElementById("data-rows");
+      if (tableBody.rows.length > 0) {
+        tableBody.deleteRow(tableBody.rows.length - 1);
+      }
+    }
+
     function calculateNetWeight() {
       const weights = document.querySelectorAll('.weight');
       const purities = document.querySelectorAll('.purity');
@@ -204,6 +226,11 @@
           nextElement.focus();
         }
       }
+    }
+
+    // Initially populate 6 rows
+    for (let i = 0; i < 6; i++) {
+      addRow();
     }
   </script>
 </body>
