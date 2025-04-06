@@ -188,6 +188,11 @@
     .net {
       color: #000 !important;
     }
+
+    /* Disable animations */
+    .no-animation tr {
+      animation: none !important;
+    }
   </style>
 </head>
 <body>
@@ -259,6 +264,18 @@
       isDarkMode = !isDarkMode;
       document.body.classList.toggle('dark-mode', isDarkMode);
       localStorage.setItem('darkMode', isDarkMode);
+    }
+
+    // Disable animations before screenshot
+    function disableAnimations() {
+      const tableBody = document.getElementById("data-rows");
+      tableBody.classList.add('no-animation');
+    }
+
+    // Enable animations after screenshot
+    function enableAnimations() {
+      const tableBody = document.getElementById("data-rows");
+      tableBody.classList.remove('no-animation');
     }
 
     function addRow(animate = true) {
@@ -344,56 +361,35 @@
       document.getElementById('weight-needed').value = '';
       document.getElementById('copper-needed').value = '';
       document.getElementById('total-weight').value = '';
-      document.getElementById('total-net').value = '';
       document.getElementById('avg-purity').value = '';
-      document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
-      document.querySelectorAll('.net').forEach(net => net.value = '');
-      const table = document.getElementById('data-table');
-      table.classList.add('fade');
-      setTimeout(() => table.classList.remove('fade'), 500);
+      document.getElementById('total-net').value = '';
+      document.getElementById('data-rows').innerHTML = '';
     }
 
-    function moveFocus(e, nextId) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const nextElement = document.getElementById(nextId);
-        if (nextElement) nextElement.focus();
-      }
+    function takeScreenshotPage() {
+      disableAnimations();
+      html2canvas(document.body).then(function(canvas) {
+        const img = canvas.toDataURL("image/png");
+        const a = document.createElement('a');
+        a.href = img;
+        a.download = 'page_screenshot.png';
+        a.click();
+        enableAnimations();
+      });
     }
 
-    async function takeScreenshotPage() {
-      const canvas = await html2canvas(document.body, { scale: 2 });
-      canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
-        } else {
-          const link = document.createElement('a');
-          link.download = 'gold_calculator_screenshot.png';
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }
-      }, 'image/png');
+    function takeScreenshotTable() {
+      disableAnimations();
+      const table = document.querySelector('table');
+      html2canvas(table).then(function(canvas) {
+        const img = canvas.toDataURL("image/png");
+        const a = document.createElement('a');
+        a.href = img;
+        a.download = 'table_screenshot.png';
+        a.click();
+        enableAnimations();
+      });
     }
-
-    async function takeScreenshotTable() {
-      const table = document.getElementById('data-table');
-      const canvas = await html2canvas(table, { scale: 2 });
-      canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
-        } else {
-          const link = document.createElement('a');
-          link.download = 'gold_calculator_table_screenshot.png';
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }
-      }, 'image/png');
-    }
-
-    // Add 6 rows without animation on load
-    for (let i = 0; i < 6; i++) addRow(false);
   </script>
 </body>
 </html>
