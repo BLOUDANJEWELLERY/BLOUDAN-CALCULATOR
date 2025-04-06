@@ -99,29 +99,6 @@
       color: #000;
     }
 
-    /* Animations */
-    .fade {
-      animation: fadeInOut 0.5s forwards;
-    }
-    @keyframes fadeInOut {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-    .slide-right {
-      animation: slideInRight 0.5s forwards;
-    }
-    @keyframes slideInRight {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(0); }
-    }
-    .slide-left {
-      animation: slideOutLeft 0.5s forwards;
-    }
-    @keyframes slideOutLeft {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-
     /* Dark Mode Styles */
     body.dark-mode {
       background-color: #000000;
@@ -187,11 +164,6 @@
 
     .net {
       color: #000 !important;
-    }
-
-    /* Disable animations */
-    .no-animation tr {
-      animation: none !important;
     }
   </style>
 </head>
@@ -266,24 +238,10 @@
       localStorage.setItem('darkMode', isDarkMode);
     }
 
-    // Disable animations before screenshot
-    function disableAnimations() {
-      const tableBody = document.getElementById("data-rows");
-      tableBody.classList.add('no-animation');
-    }
-
-    // Enable animations after screenshot
-    function enableAnimations() {
-      const tableBody = document.getElementById("data-rows");
-      tableBody.classList.remove('no-animation');
-    }
-
-    function addRow(animate = true) {
+    function addRow() {
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
       const row = document.createElement("tr");
-
-      if (animate) row.classList.add('slide-right');
 
       row.innerHTML = `
         <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
@@ -296,12 +254,8 @@
     function removeRow() {
       const tableBody = document.getElementById("data-rows");
       if (tableBody.rows.length > 0) {
-        const row = tableBody.rows[tableBody.rows.length - 1];
-        row.classList.add('slide-left');
-        row.addEventListener('animationend', () => {
-          row.remove();
-          calculateNetWeight(); // Recalculate when a row is removed
-        });
+        tableBody.deleteRow(tableBody.rows.length - 1);
+        calculateNetWeight(); // Recalculate when a row is removed
       }
     }
 
@@ -367,19 +321,16 @@
     }
 
     function takeScreenshotPage() {
-      disableAnimations();
       html2canvas(document.body).then(function(canvas) {
         const img = canvas.toDataURL("image/png");
         const a = document.createElement('a');
         a.href = img;
         a.download = 'page_screenshot.png';
         a.click();
-        enableAnimations();
       });
     }
 
     function takeScreenshotTable() {
-      disableAnimations();
       const table = document.querySelector('table');
       html2canvas(table).then(function(canvas) {
         const img = canvas.toDataURL("image/png");
@@ -387,10 +338,10 @@
         a.href = img;
         a.download = 'table_screenshot.png';
         a.click();
-        enableAnimations();
       });
     }
-    for (let i = 0; i < 6; i++) addRow();
+
+for (let i = 0; i < 6; i++) addRow();
 
   </script>
 </body>
