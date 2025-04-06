@@ -127,6 +127,12 @@
       100% { transform: translateX(-100%); }
     }
 
+    /* Disable animations class */
+    .no-animations * {
+      animation: none !important;
+      transition: none !important;
+    }
+
     /* Dark Mode Styles */
     body.dark-mode {
       background-color: #000000;
@@ -294,7 +300,7 @@
         row.classList.add('slide-left');
         row.addEventListener('animationend', () => {
           row.remove();
-          calculateNetWeight(); // Recalculate values after row removal
+          calculateWeightNeeded();
         });
       }
     }
@@ -375,18 +381,8 @@
       }
     }
 
-    // Disable animations before screenshot
-    function disableAnimations() {
-      document.body.style.animation = 'none';
-    }
-
-    // Re-enable animations after screenshot
-    function enableAnimations() {
-      document.body.style.animation = '';
-    }
-
     async function takeScreenshotPage() {
-      disableAnimations();
+      document.body.classList.add('no-animations');
       const canvas = await html2canvas(document.body, { scale: 2 });
       canvas.toBlob(function(blob) {
         const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
@@ -399,11 +395,11 @@
           link.click();
         }
       }, 'image/png');
-      enableAnimations();
+      document.body.classList.remove('no-animations');
     }
 
     async function takeScreenshotTable() {
-      disableAnimations();
+      document.body.classList.add('no-animations');
       const table = document.getElementById('data-table');
       const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
@@ -417,11 +413,10 @@
           link.click();
         }
       }, 'image/png');
-      enableAnimations();
+      document.body.classList.remove('no-animations');
     }
 
     for (let i = 0; i < 6; i++) addRow();
-
   </script>
 </body>
 </html>
