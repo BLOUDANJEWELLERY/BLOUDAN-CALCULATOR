@@ -99,29 +99,24 @@
       color: #000;
     }
 
-    /* Animations for adding and removing rows */
+    /* Animations */
     .fade {
       animation: fadeInOut 0.5s forwards;
     }
-
     @keyframes fadeInOut {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
-
     .slide-right {
       animation: slideInRight 0.5s forwards;
     }
-
     @keyframes slideInRight {
       0% { transform: translateX(100%); }
       100% { transform: translateX(0); }
     }
-
     .slide-left {
       animation: slideOutLeft 0.5s forwards;
     }
-
     @keyframes slideOutLeft {
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
@@ -167,7 +162,6 @@
       color: #ffd700;
     }
 
-    /* Adjusted position of dark mode toggle */
     .toggle-container {
       display: flex;
       justify-content: space-between;
@@ -190,13 +184,14 @@
     body:not(.dark-mode) .dark-mode-toggle i {
       color: white;
     }
-    body:not(.dark-mode) .dark-mode-toggle:hover i {
-      color: white;
-    }
 
-    /* Net Weight Text Color */
     .net {
       color: #000 !important;
+    }
+
+    /* Disable animations */
+    .no-animation tr {
+      animation: none !important;
     }
   </style>
 </head>
@@ -233,9 +228,7 @@
         <th>Net Weight</th>
       </tr>
     </thead>
-    <tbody id="data-rows">
-      <!-- Rows will be added dynamically -->
-    </tbody>
+    <tbody id="data-rows"></tbody>
     <tfoot>
       <tr>
         <td><input type="number" id="total-weight" class="result" readonly /></td>
@@ -249,10 +242,10 @@
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
     <button onclick="takeScreenshotPage()" title="Save Full Page Screenshot">
-      <i class="fas fa-file-alt"></i> <!-- Font Awesome page icon -->
+      <i class="fas fa-file-alt"></i>
     </button>
     <button onclick="takeScreenshotTable()" title="Save Table Screenshot">
-      <i class="fas fa-table"></i> <!-- Font Awesome table icon -->
+      <i class="fas fa-table"></i>
     </button>
   </div>
 
@@ -273,12 +266,25 @@
       localStorage.setItem('darkMode', isDarkMode);
     }
 
-    function addRow() {
+    // Disable animations before screenshot
+    function disableAnimations() {
+      const tableBody = document.getElementById("data-rows");
+      tableBody.classList.add('no-animation');
+    }
+
+    // Enable animations after screenshot
+    function enableAnimations() {
+      const tableBody = document.getElementById("data-rows");
+      tableBody.classList.remove('no-animation');
+    }
+
+    function addRow(animate = true) {
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
       const row = document.createElement("tr");
 
-      row.classList.add('slide-right');
+      if (animate) row.classList.add('slide-right');
+
       row.innerHTML = `
         <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
         <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
@@ -292,7 +298,10 @@
       if (tableBody.rows.length > 0) {
         const row = tableBody.rows[tableBody.rows.length - 1];
         row.classList.add('slide-left');
-        row.addEventListener('animationend', () => row.remove());
+        row.addEventListener('animationend', () => {
+          row.remove();
+          calculateNetWeight(); // Recalculate when a row is removed
+        });
       }
     }
 
@@ -352,55 +361,34 @@
       document.getElementById('weight-needed').value = '';
       document.getElementById('copper-needed').value = '';
       document.getElementById('total-weight').value = '';
-      document.getElementById('total-net').value = '';
       document.getElementById('avg-purity').value = '';
-      document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
-      document.querySelectorAll('.net').forEach(net => net.value = '');
-      
-      const table = document.getElementById('data-table');
-      table.classList.add('fade');
-      setTimeout(() => table.classList.remove('fade'), 500);
+      document.getElementById('total-net').value = '';
+      document.getElementById('data-rows').innerHTML = '';
     }
 
-    function moveFocus(e, nextId) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const nextElement = document.getElementById(nextId);
-        if (nextElement) {
-          nextElement.focus();
-        }
-      }
+    function takeScreenshotPage() {
+      disableAnimations();
+      html2canvas(document.body).then(function(canvas) {
+        const img = canvas.toDataURL("image/png");
+        const a = document.createElement('a');
+        a.href = img;
+        a.download = 'page_screenshot.png';
+        a.click();
+        enableAnimations();
+      });
     }
 
-    async function takeScreenshotPage() {
-      const canvas = await html2canvas(document.body, { scale: 2 });
-      canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
-        } else {
-          const link = document.createElement('a');
-          link.download = 'gold_calculator_screenshot.png';
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }
-      }, 'image/png');
-    }
-
-    async function takeScreenshotTable() {
-      const table = document.getElementById('data-table');
-      const canvas = await html2canvas(table, { scale: 2 });
-      canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
-        } else {
-          const link = document.createElement('a');
-          link.download = 'gold_calculator_table_screenshot.png';
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }
-      }, 'image/png');
+    function takeScreenshotTable() {
+      disableAnimations();
+      const table = document.querySelector('table');
+      html2canvas(table).then(function(canvas) {
+        const img = canvas.toDataURL("image/png");
+        const a = document.createElement('a');
+        a.href = img;
+        a.download = 'table_screenshot.png';
+        a.click();
+        enableAnimations();
+      });
     }
 
 for (let i = 0; i < 6; i++) addRow();
