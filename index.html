@@ -138,7 +138,8 @@
   <div class="action-buttons">
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
-    <button onclick="takeScreenshot()" title="Save Screenshot"><i class="fas fa-camera"></i></button>
+    <button onclick="takeFullPageScreenshot()" title="Save Full Page Screenshot"><i class="fas fa-camera"></i></button>
+    <button onclick="takeTableScreenshot()" title="Save Table Screenshot"><i class="fas fa-camera"></i></button>
   </div>
 
   <footer>
@@ -239,8 +240,24 @@
       }
     }
 
-    // Only capture the table when screenshot is taken
-    async function takeScreenshot() {
+    // Capture the full page
+    async function takeFullPageScreenshot() {
+      const canvas = await html2canvas(document.body, { scale: 2 });
+      canvas.toBlob(function(blob) {
+        const file = new File([blob], "gold_calculator_full_page_screenshot.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "Full Page Screenshot" });
+        } else {
+          const link = document.createElement('a');
+          link.download = 'gold_calculator_full_page_screenshot.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
+        }
+      }, 'image/png');
+    }
+
+    // Capture the table
+    async function takeTableScreenshot() {
       const table = document.getElementById('data-table');
       const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
