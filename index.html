@@ -6,7 +6,6 @@
   <title>GOLD CALCULATOR</title>
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -86,13 +85,15 @@
       display: flex;
       justify-content: center;
       gap: 20px;
-      flex-wrap: wrap;
     }
-    button i.fas {
-      font-size: 18px;
-    }
-    #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
-      background-color: #f9e8b3 !important;
+    .screenshot-btn {
+      background-color: transparent;
+      border: none;
+      color: #c7a332;
+      font-size: 22px;
+      cursor: pointer;
+      margin: 0 auto;
+      display: block;
     }
   </style>
 </head>
@@ -102,10 +103,10 @@
 
   <div class="input-section">
     <label>Target Purity:
-      <input type="number" inputmode="decimal" id="target-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'available-purity')" />
+      <input type="number" id="target-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'available-purity')" />
     </label>
     <label>Available Purity:
-      <input type="number" inputmode="decimal" id="available-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'weight-1')" />
+      <input type="number" id="available-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'weight-1')" />
     </label>
     <label>Weight Needed:
       <input type="number" id="weight-needed" class="result" readonly />
@@ -123,9 +124,7 @@
         <th>Net Weight</th>
       </tr>
     </thead>
-    <tbody id="data-rows">
-      <!-- Rows will be added dynamically -->
-    </tbody>
+    <tbody id="data-rows"></tbody>
     <tfoot>
       <tr>
         <td><input type="number" id="total-weight" class="result" readonly /></td>
@@ -138,8 +137,11 @@
   <div class="action-buttons">
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
-    <button onclick="takeScreenshot()" title="Save Screenshot"><i class="fas fa-camera"></i></button>
   </div>
+
+  <button class="screenshot-btn" onclick="takeScreenshot()" title="Save Screenshot">
+    <i class="fas fa-camera"></i>
+  </button>
 
   <footer>
     Powered by: <strong>BLOUDAN JEWELLERY</strong>
@@ -153,8 +155,8 @@
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td><input type="number" inputmode="decimal" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
-        <td><input type="number" inputmode="decimal" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
+        <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
+        <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
         <td><input type="number" class="net result" readonly /></td>
       `;
       tableBody.appendChild(row);
@@ -239,22 +241,19 @@
       }
     }
 
-    async function takeScreenshot() {
-      const canvas = await html2canvas(document.body, { scale: 2 });
-      canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
-        } else {
-          const link = document.createElement('a');
-          link.download = 'gold_calculator_screenshot.png';
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }
-      }, 'image/png');
+    function takeScreenshot() {
+      html2canvas(document.body).then(canvas => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL("image/png");
+        link.download = 'gold_calculator_screenshot.png';
+        link.click();
+      });
     }
 
-    for (let i = 0; i < 6; i++) addRow();
+    // Initial 6 rows
+    for (let i = 0; i < 6; i++) {
+      addRow();
+    }
   </script>
 </body>
 </html>
