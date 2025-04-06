@@ -99,6 +99,34 @@
       color: #000;
     }
 
+    /* Animations for adding and removing rows */
+    .fade {
+      animation: fadeInOut 0.5s forwards;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .slide-right {
+      animation: slideInRight 0.5s forwards;
+    }
+
+    @keyframes slideInRight {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(0); }
+    }
+
+    .slide-left {
+      animation: slideOutLeft 0.5s forwards;
+    }
+
+    @keyframes slideOutLeft {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
     /* Dark Mode Styles */
     body.dark-mode {
       background-color: #000000;
@@ -138,6 +166,38 @@
     .dark-mode-toggle:hover {
       color: #ffd700;
     }
+
+    /* Adjusted position of dark mode toggle */
+    .toggle-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .input-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* Light Mode Toggle Styles */
+    body:not(.dark-mode) .dark-mode-toggle {
+      background-color: #c7a332;
+      color: white;
+    }
+    body:not(.dark-mode) .dark-mode-toggle i {
+      color: white;
+    }
+    body:not(.dark-mode) .dark-mode-toggle:hover i {
+      color: white;
+    }
+
+    /* Net Weight Text Color */
+    .net {
+      color: #000 !important;
+    }
   </style>
 </head>
 <body>
@@ -173,7 +233,9 @@
         <th>Net Weight</th>
       </tr>
     </thead>
-    <tbody id="data-rows"></tbody>
+    <tbody id="data-rows">
+      <!-- Rows will be added dynamically -->
+    </tbody>
     <tfoot>
       <tr>
         <td><input type="number" id="total-weight" class="result" readonly /></td>
@@ -187,10 +249,10 @@
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
     <button onclick="takeScreenshotPage()" title="Save Full Page Screenshot">
-      <i class="fas fa-file-alt"></i>
+      <i class="fas fa-file-alt"></i> <!-- Font Awesome page icon -->
     </button>
     <button onclick="takeScreenshotTable()" title="Save Table Screenshot">
-      <i class="fas fa-table"></i>
+      <i class="fas fa-table"></i> <!-- Font Awesome table icon -->
     </button>
   </div>
 
@@ -201,36 +263,116 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     let isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+    }
 
-    // Toggle Dark Mode
     function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
       isDarkMode = !isDarkMode;
+      document.body.classList.toggle('dark-mode', isDarkMode);
       localStorage.setItem('darkMode', isDarkMode);
     }
 
-    // Clear all inputs
+    function addRow() {
+      const tableBody = document.getElementById("data-rows");
+      const rowCount = tableBody.rows.length;
+      const row = document.createElement("tr");
+
+      row.classList.add('slide-right');
+      row.innerHTML = `
+        <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
+        <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
+        <td><input type="number" class="net result" readonly /></td>
+      `;
+      tableBody.appendChild(row);
+    }
+
+    function removeRow() {
+      const tableBody = document.getElementById("data-rows");
+      if (tableBody.rows.length > 0) {
+        const row = tableBody.rows[tableBody.rows.length - 1];
+        row.classList.add('slide-left');
+        row.addEventListener('animationend', () => row.remove());
+      }
+    }
+
+    function calculateNetWeight() {
+      const weights = document.querySelectorAll('.weight');
+      const purities = document.querySelectorAll('.purity');
+      const nets = document.querySelectorAll('.net');
+
+      let totalWeight = 0;
+      let totalNet = 0;
+
+      for (let i = 0; i < weights.length; i++) {
+        const weight = parseFloat(weights[i].value) || 0;
+        const purity = parseFloat(purities[i].value) || 0;
+        const net = weight * purity / 999;
+        nets[i].value = net.toFixed(2);
+        totalWeight += weight;
+        totalNet += net;
+      }
+
+      document.getElementById('total-weight').value = totalWeight.toFixed(2);
+      document.getElementById('total-net').value = totalNet.toFixed(2);
+      if (totalWeight > 0) {
+        const avgPurity = (totalNet / totalWeight) * 999;
+        document.getElementById('avg-purity').value = avgPurity.toFixed(1);
+      } else {
+        document.getElementById('avg-purity').value = '';
+      }
+
+      calculateWeightNeeded();
+    }
+
+    function calculateWeightNeeded() {
+      const W1 = parseFloat(document.getElementById('total-weight').value);
+      const P1 = parseFloat(document.getElementById('avg-purity').value);
+      const Pt = parseFloat(document.getElementById('target-purity').value);
+      const P2 = parseFloat(document.getElementById('available-purity').value);
+
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && !isNaN(P2) && P2 !== Pt) {
+        const W2 = (W1 * (Pt - P1)) / (P2 - Pt);
+        document.getElementById('weight-needed').value = W2 > 0 ? W2.toFixed(2) : '0.00';
+      } else {
+        document.getElementById('weight-needed').value = '';
+      }
+
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && Pt !== 0) {
+        const copperW = (W1 * (P1 - Pt)) / Pt;
+        document.getElementById('copper-needed').value = copperW > 0 ? copperW.toFixed(2) : '0.00';
+      } else {
+        document.getElementById('copper-needed').value = '';
+      }
+    }
+
     function clearAll() {
-      document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+      document.getElementById('target-purity').value = '';
+      document.getElementById('available-purity').value = '';
+      document.getElementById('weight-needed').value = '';
+      document.getElementById('copper-needed').value = '';
+      document.getElementById('total-weight').value = '';
+      document.getElementById('total-net').value = '';
+      document.getElementById('avg-purity').value = '';
+      document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
+      document.querySelectorAll('.net').forEach(net => net.value = '');
+      
+      const table = document.getElementById('data-table');
+      table.classList.add('fade');
+      setTimeout(() => table.classList.remove('fade'), 500);
     }
 
-    // Function to disable animations temporarily
-    function disableAnimations() {
-      document.body.style.transition = 'none';
-      const tables = document.querySelectorAll('table');
-      tables.forEach(table => table.style.transition = 'none');
+    function moveFocus(e, nextId) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const nextElement = document.getElementById(nextId);
+        if (nextElement) {
+          nextElement.focus();
+        }
+      }
     }
 
-    // Function to enable animations back
-    function enableAnimations() {
-      document.body.style.transition = '';
-      const tables = document.querySelectorAll('table');
-      tables.forEach(table => table.style.transition = '');
-    }
-
-    // Take a screenshot of the entire page
     async function takeScreenshotPage() {
-      disableAnimations(); // Disable animations before screenshot
       const canvas = await html2canvas(document.body, { scale: 2 });
       canvas.toBlob(function(blob) {
         const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
@@ -242,13 +384,10 @@
           link.href = URL.createObjectURL(blob);
           link.click();
         }
-        enableAnimations(); // Re-enable animations after screenshot
       }, 'image/png');
     }
 
-    // Take a screenshot of the table only
     async function takeScreenshotTable() {
-      disableAnimations(); // Disable animations before screenshot
       const table = document.getElementById('data-table');
       const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
@@ -261,69 +400,11 @@
           link.href = URL.createObjectURL(blob);
           link.click();
         }
-        enableAnimations(); // Re-enable animations after screenshot
       }, 'image/png');
     }
 
-    // Add a new row to the table
-    function addRow() {
-      const table = document.getElementById('data-rows');
-      const row = document.createElement('tr');
-      row.innerHTML = `<td><input type="number" class="weight" oninput="calculateNetWeight(this)" /></td>
-                        <td><input type="number" class="purity" oninput="calculateNetWeight(this)" /></td>
-                        <td><input type="number" class="net" readonly /></td>`;
-      table.appendChild(row);
-    }
+for (let i = 0; i < 6; i++) addRow();
 
-    // Remove a row from the table
-    function removeRow() {
-      const table = document.getElementById('data-rows');
-      if (table.rows.length > 0) {
-        table.deleteRow(table.rows.length - 1);
-      }
-    }
-
-    // Function to calculate net weight based on weight and purity
-    function calculateNetWeight(input) {
-      const row = input.closest('tr');
-      const weight = row.querySelector('.weight').value;
-      const purity = row.querySelector('.purity').value;
-      const net = row.querySelector('.net');
-      if (weight && purity) {
-        net.value = (weight * (purity / 100)).toFixed(2);
-        calculateTotal();
-      }
-    }
-
-    // Calculate total weight, average purity, and total net
-    function calculateTotal() {
-      const rows = document.querySelectorAll('#data-rows tr');
-      let totalWeight = 0, totalPurity = 0, totalNet = 0;
-      rows.forEach(row => {
-        const weight = parseFloat(row.querySelector('.weight').value) || 0;
-        const purity = parseFloat(row.querySelector('.purity').value) || 0;
-        const net = parseFloat(row.querySelector('.net').value) || 0;
-        totalWeight += weight;
-        totalPurity += weight * purity;
-        totalNet += net;
-      });
-      document.getElementById('total-weight').value = totalWeight.toFixed(2);
-      document.getElementById('avg-purity').value = (totalPurity / totalWeight).toFixed(2);
-      document.getElementById('total-net').value = totalNet.toFixed(2);
-    }
-
-    // Calculate the weight needed based on target purity and available purity
-    function calculateWeightNeeded() {
-      const targetPurity = parseFloat(document.getElementById('target-purity').value) || 0;
-      const availablePurity = parseFloat(document.getElementById('available-purity').value) || 0;
-      const weightNeeded = document.getElementById('weight-needed');
-      const copperNeeded = document.getElementById('copper-needed');
-      if (targetPurity && availablePurity) {
-        const weight = (100 * (targetPurity - availablePurity)) / (availablePurity - 100);
-        weightNeeded.value = weight.toFixed(2);
-        copperNeeded.value = (weight * (100 - targetPurity) / 100).toFixed(2);
-      }
-    }
   </script>
 </body>
 </html>
