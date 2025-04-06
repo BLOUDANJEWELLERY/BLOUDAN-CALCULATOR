@@ -300,6 +300,7 @@
         row.classList.add('slide-left');
         row.addEventListener('animationend', () => {
           row.remove();
+          calculateNetWeight();
           calculateWeightNeeded();
         });
       }
@@ -371,9 +372,27 @@
       setTimeout(() => table.classList.remove('fade'), 500);
     }
 
-    function moveFocus(e, nextId) {
-      if (e.key === "Enter") {
-        e.preventDefault();
+    function takeScreenshotPage() {
+      html2canvas(document.body).then((canvas) => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'gold_calculator_page.png';
+        link.click();
+      });
+    }
+
+    function takeScreenshotTable() {
+      const table = document.getElementById('data-table');
+      html2canvas(table).then((canvas) => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'gold_calculator_table.png';
+        link.click();
+      });
+    }
+
+    function moveFocus(event, nextId) {
+      if (event.key === "Enter") {
         const nextElement = document.getElementById(nextId);
         if (nextElement) {
           nextElement.focus();
@@ -381,42 +400,8 @@
       }
     }
 
-    async function takeScreenshotPage() {
-      document.body.classList.add('no-animations');
-      const canvas = await html2canvas(document.body, { scale: 2 });
-      canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
-        } else {
-          const link = document.createElement('a');
-          link.download = 'gold_calculator_screenshot.png';
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }
-      }, 'image/png');
-      document.body.classList.remove('no-animations');
-    }
+for (let i = 0; i < 6; i++) addRow();
 
-    async function takeScreenshotTable() {
-      document.body.classList.add('no-animations');
-      const table = document.getElementById('data-table');
-      const canvas = await html2canvas(table, { scale: 2 });
-      canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
-        } else {
-          const link = document.createElement('a');
-          link.download = 'gold_calculator_table_screenshot.png';
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }
-      }, 'image/png');
-      document.body.classList.remove('no-animations');
-    }
-
-    for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
 </html>
