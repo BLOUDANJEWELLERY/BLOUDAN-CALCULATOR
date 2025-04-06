@@ -6,13 +6,10 @@
   <title>GOLD CALCULATOR</title>
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 12px;
-      max-width: 600px;
-      margin: auto;
       background-color: #fff8e1;
       color: #000;
       transition: background-color 0.3s, color 0.3s;
@@ -22,6 +19,11 @@
       text-align: center;
       font-size: 24px;
       font-weight: 600;
+    }
+    #table-container {
+      max-width: 600px;
+      margin: auto;
+      position: relative;
     }
     table {
       width: 100%;
@@ -54,6 +56,9 @@
     }
     .input-section {
       margin-bottom: 20px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
     .input-section input {
       width: 100%;
@@ -72,8 +77,6 @@
       font-size: 15px;
       border-radius: 5px;
       cursor: pointer;
-      display: block;
-      margin: 14px auto;
       font-family: Arial, sans-serif;
     }
     button:hover {
@@ -90,6 +93,7 @@
       justify-content: center;
       gap: 20px;
       flex-wrap: wrap;
+      margin-top: 20px;
     }
     button i.fas {
       font-size: 18px;
@@ -98,36 +102,27 @@
       background-color: #f9e8b3 !important;
       color: #000;
     }
-
-    /* Animations for adding and removing rows */
     .fade {
       animation: fadeInOut 0.5s forwards;
     }
-
     @keyframes fadeInOut {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
-
     .slide-right {
       animation: slideInRight 0.5s forwards;
     }
-
     @keyframes slideInRight {
       0% { transform: translateX(100%); }
       100% { transform: translateX(0); }
     }
-
     .slide-left {
       animation: slideOutLeft 0.5s forwards;
     }
-
     @keyframes slideOutLeft {
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
-
-    /* Dark Mode Styles */
     body.dark-mode {
       background-color: #000000;
       color: #fff;
@@ -153,8 +148,6 @@
     body.dark-mode footer {
       color: #c7a332;
     }
-
-    /* Dark mode toggle button styles */
     .dark-mode-toggle {
       background-color: transparent;
       border: none;
@@ -166,23 +159,16 @@
     .dark-mode-toggle:hover {
       color: #ffd700;
     }
-
-    /* Adjusted position of dark mode toggle */
     .toggle-container {
       display: flex;
       justify-content: space-between;
       gap: 10px;
       align-items: center;
       margin-top: 20px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
-
-    .input-buttons {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    /* Light Mode Toggle Styles */
     body:not(.dark-mode) .dark-mode-toggle {
       background-color: #c7a332;
       color: white;
@@ -193,8 +179,6 @@
     body:not(.dark-mode) .dark-mode-toggle:hover i {
       color: white;
     }
-
-    /* Net Weight Text Color */
     .net {
       color: #000 !important;
     }
@@ -202,14 +186,12 @@
 </head>
 <body>
   <h2>GOLD CALCULATOR</h2>
-
   <div class="toggle-container">
     <button onclick="clearAll()">AC</button>
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">
       <i class="fas fa-moon"></i>
     </button>
   </div>
-
   <div class="input-section">
     <label>Target Purity:
       <input type="number" id="target-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'available-purity')" />
@@ -225,34 +207,36 @@
     </label>
   </div>
 
-  <table id="data-table">
-    <thead>
-      <tr>
-        <th>Weight</th>
-        <th>Purity</th>
-        <th>Net Weight</th>
-      </tr>
-    </thead>
-    <tbody id="data-rows">
-      <!-- Rows will be added dynamically -->
-    </tbody>
-    <tfoot>
-      <tr>
-        <td><input type="number" id="total-weight" class="result" readonly /></td>
-        <td><input type="number" id="avg-purity" class="result" readonly /></td>
-        <td><input type="number" id="total-net" class="result" readonly /></td>
-      </tr>
-    </tfoot>
-  </table>
+  <div id="table-container">
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th>Weight</th>
+          <th>Purity</th>
+          <th>Net Weight</th>
+        </tr>
+      </thead>
+      <tbody id="data-rows">
+        <!-- Rows will be added dynamically -->
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><input type="number" id="total-weight" class="result" readonly /></td>
+          <td><input type="number" id="avg-purity" class="result" readonly /></td>
+          <td><input type="number" id="total-net" class="result" readonly /></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
   <div class="action-buttons">
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
     <button onclick="takeScreenshotPage()" title="Save Full Page Screenshot">
-      <i class="fas fa-file-alt"></i> <!-- Font Awesome page icon -->
+      <i class="fas fa-file-alt"></i>
     </button>
     <button onclick="takeScreenshotTable()" title="Save Table Screenshot">
-      <i class="fas fa-table"></i> <!-- Font Awesome table icon -->
+      <i class="fas fa-table"></i>
     </button>
   </div>
 
@@ -356,7 +340,7 @@
       document.getElementById('avg-purity').value = '';
       document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
       document.querySelectorAll('.net').forEach(net => net.value = '');
-      
+
       const table = document.getElementById('data-table');
       table.classList.add('fade');
       setTimeout(() => table.classList.remove('fade'), 500);
@@ -366,15 +350,14 @@
       if (e.key === "Enter") {
         e.preventDefault();
         const nextElement = document.getElementById(nextId);
-        if (nextElement) {
-          nextElement.focus();
-        }
+        if (nextElement) nextElement.focus();
       }
     }
 
     async function takeScreenshotPage() {
-      const canvas = await html2canvas(document.body, { scale: 2 });
-      canvas.toBlob(function(blob) {
+      const container = document.documentElement;
+      const canvas = await html2canvas(container, { scale: 2, useCORS: true });
+      canvas.toBlob(blob => {
         const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], title: "Screenshot" });
@@ -388,9 +371,9 @@
     }
 
     async function takeScreenshotTable() {
-      const table = document.getElementById('data-table');
-      const canvas = await html2canvas(table, { scale: 2 });
-      canvas.toBlob(function(blob) {
+      const container = document.getElementById('table-container');
+      const canvas = await html2canvas(container, { scale: 2, useCORS: true });
+      canvas.toBlob(blob => {
         const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], title: "Screenshot" });
@@ -402,6 +385,8 @@
         }
       }, 'image/png');
     }
+
+    // Load 6 rows by default
     for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
