@@ -15,45 +15,28 @@
       margin: auto;
       background-color: #fff8e1;
       color: #000;
-      transition: background-color 0.3s, color 0.3s;
     }
-
-    /* Light Mode Styles */
-    .light-mode {
-      background-color: #fff8e1;
-      color: #000;
-    }
-
-    /* Dark Mode Styles */
-    .dark-mode {
-      background-color: #121212;
-      color: #f1f1f1;
-    }
-
     h2 {
       color: #c7a332;
       text-align: center;
       font-size: 24px;
       font-weight: 600;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      transition: opacity 0.5s ease;
     }
-
     th, td {
       padding: 9px;
       text-align: left;
       border: 1px solid #c7a332;
     }
-
     th {
       text-align: center;
       background-color: #fdf3d2;
     }
-
     input[type="number"] {
       width: 100%;
       box-sizing: border-box;
@@ -62,25 +45,14 @@
       color: #000;
       border: 1px solid #c7a332;
       font-size: 14px;
-      transition: background-color 0.3s, color 0.3s;
     }
-
-    /* Dark mode specific input field styles */
-    .dark-mode input[type="number"] {
-      background-color: #333;
-      color: #f1f1f1;
-      border: 1px solid #c7a332;
-    }
-
     .result {
       background-color: #f9e8b3 !important;
       font-weight: bold;
     }
-
     .input-section {
       margin-bottom: 20px;
     }
-
     .input-section input {
       width: 100%;
       padding: 8px;
@@ -90,14 +62,6 @@
       border: 1px solid #c7a332;
       font-size: 14px;
     }
-
-    /* Dark mode specific styles for input fields */
-    .dark-mode .input-section input {
-      background-color: #333;
-      color: #f1f1f1;
-      border: 1px solid #c7a332;
-    }
-
     button {
       background-color: #c7a332;
       color: white;
@@ -110,65 +74,60 @@
       margin: 14px auto;
       font-family: Arial, sans-serif;
     }
-
     button:hover {
       background-color: #d4b03c;
     }
-
     footer {
       margin-top: 35px;
       text-align: center;
       color: #c7a332;
       font-size: 15px;
     }
-
     .action-buttons {
       display: flex;
       justify-content: center;
       gap: 20px;
       flex-wrap: wrap;
     }
-
     button i.fas {
       font-size: 18px;
     }
-
     #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
       background-color: #f9e8b3 !important;
     }
 
-    /* Dark Mode Specific Styles for Special Fields */
-    .dark-mode #weight-needed,
-    .dark-mode #copper-needed,
-    .dark-mode .net,
-    .dark-mode #total-weight,
-    .dark-mode #avg-purity,
-    .dark-mode #total-net {
-      background-color: #444 !important;
-      color: #fff !important;
+    /* Animations for adding and removing rows */
+    .fade {
+      animation: fadeInOut 0.5s forwards;
     }
 
-    /* Dark Mode Button */
-    .dark-mode-toggle {
-      background-color: #333;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      margin: 20px 0;
-      font-size: 16px;
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
     }
-    .dark-mode-toggle:hover {
-      background-color: #444;
+
+    .slide-right {
+      animation: slideInRight 0.5s forwards;
+    }
+
+    @keyframes slideInRight {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(0); }
+    }
+
+    .slide-left {
+      animation: slideOutLeft 0.5s forwards;
+    }
+
+    @keyframes slideOutLeft {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
     }
   </style>
 </head>
-<body class="light-mode">
+<body>
   <h2>GOLD CALCULATOR</h2>
   <button onclick="clearAll()">AC</button>
-  
-  <!-- Dark Mode Toggle Button -->
-  <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 
   <div class="input-section">
     <label>Target Purity:
@@ -222,30 +181,12 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-    let isDarkMode = false;
-
-    function toggleDarkMode() {
-      const body = document.body;
-      const button = document.querySelector('.dark-mode-toggle');
-
-      if (isDarkMode) {
-        body.classList.remove('dark-mode');
-        body.classList.add('light-mode');
-        button.innerText = 'Toggle Dark Mode';
-      } else {
-        body.classList.remove('light-mode');
-        body.classList.add('dark-mode');
-        button.innerText = 'Toggle Light Mode';
-      }
-
-      isDarkMode = !isDarkMode;
-    }
-
     function addRow() {
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
       const row = document.createElement("tr");
 
+      row.classList.add('slide-right');
       row.innerHTML = `
         <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
         <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
@@ -257,7 +198,9 @@
     function removeRow() {
       const tableBody = document.getElementById("data-rows");
       if (tableBody.rows.length > 0) {
-        tableBody.deleteRow(tableBody.rows.length - 1);
+        const row = tableBody.rows[tableBody.rows.length - 1];
+        row.classList.add('slide-left');
+        row.addEventListener('animationend', () => row.remove());
       }
     }
 
@@ -321,6 +264,10 @@
       document.getElementById('avg-purity').value = '';
       document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
       document.querySelectorAll('.net').forEach(net => net.value = '');
+      
+      const table = document.getElementById('data-table');
+      table.classList.add('fade');
+      setTimeout(() => table.classList.remove('fade'), 500);
     }
 
     function moveFocus(e, nextId) {
