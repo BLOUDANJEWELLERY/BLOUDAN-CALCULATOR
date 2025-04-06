@@ -239,15 +239,17 @@
       }
     }
 
+    // Only capture the table when screenshot is taken
     async function takeScreenshot() {
-      const canvas = await html2canvas(document.body, { scale: 2 });
+      const table = document.getElementById('data-table');
+      const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
+        const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
+          navigator.share({ files: [file], title: "Table Screenshot" });
         } else {
           const link = document.createElement('a');
-          link.download = 'gold_calculator_screenshot.png';
+          link.download = 'gold_calculator_table_screenshot.png';
           link.href = URL.createObjectURL(blob);
           link.click();
         }
