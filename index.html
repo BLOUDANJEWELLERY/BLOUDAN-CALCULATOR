@@ -6,9 +6,10 @@
   <title>GOLD CALCULATOR</title>
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
     body {
-      font-family: Arial, sans-serif; /* Set to Arial */
+      font-family: Arial, sans-serif;
       padding: 12px;
       max-width: 600px;
       margin: auto;
@@ -19,7 +20,7 @@
       color: #c7a332;
       text-align: center;
       font-size: 24px;
-      font-weight: 600; /* Bold heading */
+      font-weight: 600;
     }
     table {
       width: 100%;
@@ -39,13 +40,13 @@
       width: 100%;
       box-sizing: border-box;
       padding: 7px;
-      background-color: #fff; /* White background for input */
+      background-color: #fff;
       color: #000;
       border: 1px solid #c7a332;
       font-size: 14px;
     }
     .result {
-      background-color: #f9e8b3; /* Changed to #f9e8b3 */
+      background-color: #f9e8b3 !important;
       font-weight: bold;
     }
     .input-section {
@@ -56,7 +57,7 @@
       padding: 8px;
       margin-bottom: 10px;
       box-sizing: border-box;
-      background-color: #fff; /* White background for input */
+      background-color: #fff;
       border: 1px solid #c7a332;
       font-size: 14px;
     }
@@ -70,7 +71,7 @@
       cursor: pointer;
       display: block;
       margin: 14px auto;
-      font-family: Arial, sans-serif; /* Apply Arial font to buttons */
+      font-family: Arial, sans-serif;
     }
     button:hover {
       background-color: #d4b03c;
@@ -85,20 +86,13 @@
       display: flex;
       justify-content: center;
       gap: 20px;
+      flex-wrap: wrap;
     }
-    /* Specific styles for weight needed, copper needed, net weight, total weight, average purity, and total net weight fields */
+    button i.fas {
+      font-size: 18px;
+    }
     #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
-      background-color: #f9e8b3 !important; /* Set background to #f9e8b3 */
-    }
-    /* Camera screenshot button style */
-    .screenshot-btn {
-      background-color: transparent;
-      border: none;
-      color: #c7a332;
-      font-size: 26px;
-      cursor: pointer;
-      margin: 0 auto;
-      display: block;
+      background-color: #f9e8b3 !important;
     }
   </style>
 </head>
@@ -130,7 +124,7 @@
       </tr>
     </thead>
     <tbody id="data-rows">
-      <!-- Initial 6 rows will be dynamically added using script -->
+      <!-- Rows will be added dynamically -->
     </tbody>
     <tfoot>
       <tr>
@@ -144,16 +138,14 @@
   <div class="action-buttons">
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
+    <button onclick="takeScreenshot()" title="Save Screenshot"><i class="fas fa-camera"></i></button>
   </div>
-
-  <button class="screenshot-btn" onclick="takeScreenshot()" title="Save Screenshot">
-    <i class="fas fa-camera"></i>
-  </button>
 
   <footer>
     Powered by: <strong>BLOUDAN JEWELLERY</strong>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     function addRow() {
       const tableBody = document.getElementById("data-rows");
@@ -210,7 +202,6 @@
       const Pt = parseFloat(document.getElementById('target-purity').value);
       const P2 = parseFloat(document.getElementById('available-purity').value);
 
-      // Metal weight needed
       if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && !isNaN(P2) && P2 !== Pt) {
         const W2 = (W1 * (Pt - P1)) / (P2 - Pt);
         document.getElementById('weight-needed').value = W2 > 0 ? W2.toFixed(2) : '0.00';
@@ -218,7 +209,6 @@
         document.getElementById('weight-needed').value = '';
       }
 
-      // Copper needed (P2 = 0)
       if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && Pt !== 0) {
         const copperW = (W1 * (P1 - Pt)) / Pt;
         document.getElementById('copper-needed').value = copperW > 0 ? copperW.toFixed(2) : '0.00';
@@ -249,19 +239,22 @@
       }
     }
 
-    function takeScreenshot() {
-      html2canvas(document.body).then(canvas => {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL("image/png");
-        link.download = 'gold_calculator_screenshot.png';
-        link.click(); // Auto-save without user prompt
-      });
+    async function takeScreenshot() {
+      const canvas = await html2canvas(document.body, { scale: 2 });
+      canvas.toBlob(function(blob) {
+        const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "Screenshot" });
+        } else {
+          const link = document.createElement('a');
+          link.download = 'gold_calculator_screenshot.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
+        }
+      }, 'image/png');
     }
 
-    // Initially populate 6 rows
-    for (let i = 0; i < 6; i++) {
-      addRow();
-    }
+    for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
 </html>
