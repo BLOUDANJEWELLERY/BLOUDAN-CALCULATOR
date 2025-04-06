@@ -50,6 +50,7 @@
     .result {
       background-color: #f9e8b3 !important;
       font-weight: bold;
+      color: #000;
     }
     .input-section {
       margin-bottom: 20px;
@@ -95,6 +96,7 @@
     }
     #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
       background-color: #f9e8b3 !important;
+      color: #000;
     }
 
     /* Animations for adding and removing rows */
@@ -168,21 +170,28 @@
     /* Adjusted position of dark mode toggle */
     .toggle-container {
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       gap: 10px;
       align-items: center;
+      margin-top: 20px;
+    }
+
+    .input-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
     }
   </style>
 </head>
 <body>
+  <h2>GOLD CALCULATOR</h2>
+
   <div class="toggle-container">
+    <button onclick="clearAll()">AC</button>
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">
       <i class="fas fa-moon"></i>
     </button>
-    <button onclick="clearAll()">AC</button>
   </div>
-
-  <h2>GOLD CALCULATOR</h2>
 
   <div class="input-section">
     <label>Target Purity:
