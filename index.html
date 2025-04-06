@@ -181,6 +181,23 @@
       justify-content: space-between;
       gap: 10px;
     }
+
+    /* Light Mode Toggle Styles */
+    body:not(.dark-mode) .dark-mode-toggle {
+      background-color: #c7a332;
+      color: white;
+    }
+    body:not(.dark-mode) .dark-mode-toggle i {
+      color: white;
+    }
+    body:not(.dark-mode) .dark-mode-toggle:hover i {
+      color: white;
+    }
+
+    /* Net Weight Text Color */
+    .net {
+      color: #000 !important;
+    }
   </style>
 </head>
 <body>
@@ -385,8 +402,6 @@
         }
       }, 'image/png');
     }
-
-    for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
 </html>
