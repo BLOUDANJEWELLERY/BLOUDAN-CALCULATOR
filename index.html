@@ -292,7 +292,10 @@
       if (tableBody.rows.length > 0) {
         const row = tableBody.rows[tableBody.rows.length - 1];
         row.classList.add('slide-left');
-        row.addEventListener('animationend', () => row.remove());
+        row.addEventListener('animationend', () => {
+          row.remove();
+          calculateNetWeight(); // Recalculate values after row removal
+        });
       }
     }
 
@@ -372,7 +375,18 @@
       }
     }
 
+    // Disable animations before screenshot
+    function disableAnimations() {
+      document.body.style.animation = 'none';
+    }
+
+    // Re-enable animations after screenshot
+    function enableAnimations() {
+      document.body.style.animation = '';
+    }
+
     async function takeScreenshotPage() {
+      disableAnimations();
       const canvas = await html2canvas(document.body, { scale: 2 });
       canvas.toBlob(function(blob) {
         const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
@@ -385,9 +399,11 @@
           link.click();
         }
       }, 'image/png');
+      enableAnimations();
     }
 
     async function takeScreenshotTable() {
+      disableAnimations();
       const table = document.getElementById('data-table');
       const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
@@ -401,9 +417,10 @@
           link.click();
         }
       }, 'image/png');
+      enableAnimations();
     }
 
-for (let i = 0; i < 6; i++) addRow();
+    for (let i = 0; i < 6; i++) addRow();
 
   </script>
 </body>
