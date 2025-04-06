@@ -13,6 +13,8 @@
       max-width: 600px;
       margin: auto;
       transition: background-color 0.3s, color 0.3s;
+      background-color: #fff;
+      color: #000;
     }
 
     h2 {
@@ -144,6 +146,40 @@
     .dark-mode button:hover {
       background-color: #f9e800;
     }
+
+    /* Adjusted output cells for better readability in dark mode */
+    .dark-mode .result {
+      background-color: #444 !important;
+      color: #fff;
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .slide-out {
+      animation: slideOut 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -151,7 +187,7 @@
 
   <!-- Dark Mode Toggle Button -->
   <button onclick="toggleDarkMode()">
-    <i class="fas fa-moon"></i> Toggle Dark Mode
+    <i class="fas fa-moon"></i>
   </button>
 
   <button onclick="clearAll()">AC</button>
@@ -192,10 +228,10 @@
   </table>
 
   <div class="action-buttons">
-    <button onclick="addRow()">+</button>
-    <button onclick="removeRow()">-</button>
-    <button onclick="takeFullPageScreenshot()"><i class="fas fa-file-alt"></i> Full Page</button>
-    <button onclick="takeTableScreenshot()"><i class="fas fa-table"></i> Table</button>
+    <button onclick="addRow()"><i class="fas fa-plus"></i></button>
+    <button onclick="removeRow()"><i class="fas fa-minus"></i></button>
+    <button onclick="takeFullPageScreenshot()"><i class="fas fa-file-alt"></i></button>
+    <button onclick="takeTableScreenshot()"><i class="fas fa-table"></i></button>
   </div>
 
   <footer>
@@ -227,6 +263,7 @@
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
       const row = document.createElement("tr");
+      row.classList.add('fade-in');
 
       row.innerHTML = `
         <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
@@ -239,7 +276,9 @@
     function removeRow() {
       const tableBody = document.getElementById("data-rows");
       if (tableBody.rows.length > 0) {
-        tableBody.deleteRow(tableBody.rows.length - 1);
+        const rowToRemove = tableBody.rows[tableBody.rows.length - 1];
+        rowToRemove.classList.add('slide-out');
+        setTimeout(() => rowToRemove.remove(), 300);
       }
     }
 
