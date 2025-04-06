@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    /* Light Mode */
     body {
       font-family: Arial, sans-serif;
       padding: 12px;
@@ -95,37 +94,6 @@
     #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
       background-color: #f9e8b3 !important;
     }
-
-    /* Dark Mode */
-    body.dark-mode {
-      background-color: #333;
-      color: #fff;
-    }
-    body.dark-mode h2 {
-      color: #c7a332;
-    }
-    body.dark-mode table {
-      background-color: #444;
-    }
-    body.dark-mode th, body.dark-mode td {
-      border: 1px solid #c7a332;
-      color: #fff;
-    }
-    body.dark-mode input[type="number"] {
-      background-color: #555;
-      color: #fff;
-      border: 1px solid #c7a332;
-    }
-    body.dark-mode button {
-      background-color: #c7a332;
-      color: #fff;
-    }
-    body.dark-mode footer {
-      color: #c7a332;
-    }
-    body.dark-mode .result {
-      background-color: #444 !important;
-    }
   </style>
 </head>
 <body>
@@ -182,27 +150,8 @@
     Powered by: <strong>BLOUDAN JEWELLERY</strong>
   </footer>
 
-  <!-- Dark Mode Toggle -->
-  <button id="dark-mode-toggle" onclick="toggleDarkMode()">Switch to Dark Mode</button>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-    function toggleDarkMode() {
-      const body = document.body;
-      body.classList.toggle('dark-mode');
-      const isDarkMode = body.classList.contains('dark-mode');
-      localStorage.setItem('dark-mode', isDarkMode);
-      document.getElementById('dark-mode-toggle').textContent = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
-    }
-
-    // Load saved theme preference
-    window.onload = () => {
-      if (localStorage.getItem('dark-mode') === 'true') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('dark-mode-toggle').textContent = 'Switch to Light Mode';
-      }
-    };
-
     function addRow() {
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
@@ -304,26 +253,29 @@
         } else {
           const link = document.createElement('a');
           link.download = 'gold_calculator_screenshot.png';
-          link.href = URL.createObjectURL(file);
+          link.href = URL.createObjectURL(blob);
           link.click();
         }
-      });
+      }, 'image/png');
     }
 
     async function takeScreenshotTable() {
-      const canvas = await html2canvas(document.getElementById('data-table'), { scale: 2 });
+      const table = document.getElementById('data-table');
+      const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_table.png", { type: "image/png" });
+        const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Table Screenshot" });
+          navigator.share({ files: [file], title: "Screenshot" });
         } else {
           const link = document.createElement('a');
-          link.download = 'gold_calculator_table.png';
-          link.href = URL.createObjectURL(file);
+          link.download = 'gold_calculator_table_screenshot.png';
+          link.href = URL.createObjectURL(blob);
           link.click();
         }
-      });
+      }, 'image/png');
     }
+
+    for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
 </html>
