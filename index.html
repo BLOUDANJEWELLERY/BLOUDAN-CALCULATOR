@@ -6,36 +6,41 @@
   <title>GOLD CALCULATOR</title>
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 12px;
       max-width: 600px;
       margin: auto;
-      background-color: #fff8e1;
-      color: #000;
+      transition: background-color 0.3s, color 0.3s;
     }
+
     h2 {
       color: #c7a332;
       text-align: center;
       font-size: 24px;
       font-weight: 600;
+      transition: color 0.3s;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      transition: background-color 0.3s, color 0.3s;
     }
+
     th, td {
       padding: 9px;
       text-align: left;
       border: 1px solid #c7a332;
     }
+
     th {
       text-align: center;
       background-color: #fdf3d2;
     }
+
     input[type="number"] {
       width: 100%;
       box-sizing: border-box;
@@ -45,13 +50,16 @@
       border: 1px solid #c7a332;
       font-size: 14px;
     }
+
     .result {
       background-color: #f9e8b3 !important;
       font-weight: bold;
     }
+
     .input-section {
       margin-bottom: 20px;
     }
+
     .input-section input {
       width: 100%;
       padding: 8px;
@@ -61,6 +69,7 @@
       border: 1px solid #c7a332;
       font-size: 14px;
     }
+
     button {
       background-color: #c7a332;
       color: white;
@@ -72,32 +81,79 @@
       display: block;
       margin: 14px auto;
       font-family: Arial, sans-serif;
+      transition: background-color 0.3s, transform 0.3s;
     }
+
     button:hover {
       background-color: #d4b03c;
+      transform: scale(1.05);
     }
+
     footer {
       margin-top: 35px;
       text-align: center;
       color: #c7a332;
       font-size: 15px;
     }
+
     .action-buttons {
       display: flex;
       justify-content: center;
       gap: 20px;
       flex-wrap: wrap;
     }
+
     button i.fas {
       font-size: 18px;
     }
+
     #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
       background-color: #f9e8b3 !important;
+    }
+
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode h2 {
+      color: #ffeb3b;
+    }
+
+    body.dark-mode table {
+      background-color: #333;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode th {
+      background-color: #444;
+    }
+
+    body.dark-mode input[type="number"], .dark-mode .result {
+      background-color: #555;
+      color: #fff;
+      border-color: #ffeb3b;
+    }
+
+    .dark-mode button {
+      background-color: #ffeb3b;
+      color: #121212;
+    }
+
+    .dark-mode button:hover {
+      background-color: #f9e800;
     }
   </style>
 </head>
 <body>
   <h2>GOLD CALCULATOR</h2>
+
+  <!-- Dark Mode Toggle Button -->
+  <button onclick="toggleDarkMode()">
+    <i class="fas fa-moon"></i> Toggle Dark Mode
+  </button>
+
   <button onclick="clearAll()">AC</button>
 
   <div class="input-section">
@@ -138,12 +194,8 @@
   <div class="action-buttons">
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
-    <button onclick="takeScreenshotPage()" title="Save Full Page Screenshot">
-      <i class="fas fa-file-alt"></i> <!-- Font Awesome page icon -->
-    </button>
-    <button onclick="takeScreenshotTable()" title="Save Table Screenshot">
-      <i class="fas fa-table"></i> <!-- Font Awesome table icon -->
-    </button>
+    <button onclick="takeFullPageScreenshot()"><i class="fas fa-file-alt"></i> Full Page</button>
+    <button onclick="takeTableScreenshot()"><i class="fas fa-table"></i> Table</button>
   </div>
 
   <footer>
@@ -152,6 +204,25 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
+    let darkMode = localStorage.getItem('darkMode') === 'enabled';
+
+    // Toggle Dark Mode
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      if (darkMode) {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'enabled');
+      } else {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', 'disabled');
+      }
+    }
+
+    // Apply dark mode on load
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+    }
+
     function addRow() {
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
@@ -244,7 +315,7 @@
       }
     }
 
-    async function takeScreenshotPage() {
+    async function takeFullPageScreenshot() {
       const canvas = await html2canvas(document.body, { scale: 2 });
       canvas.toBlob(function(blob) {
         const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
@@ -259,16 +330,16 @@
       }, 'image/png');
     }
 
-    async function takeScreenshotTable() {
-      const table = document.getElementById('data-table');
+    async function takeTableScreenshot() {
+      const table = document.getElementById("data-table");
       const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
+        const file = new File([blob], "table_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Screenshot" });
+          navigator.share({ files: [file], title: "Table Screenshot" });
         } else {
           const link = document.createElement('a');
-          link.download = 'gold_calculator_table_screenshot.png';
+          link.download = 'table_screenshot.png';
           link.href = URL.createObjectURL(blob);
           link.click();
         }
