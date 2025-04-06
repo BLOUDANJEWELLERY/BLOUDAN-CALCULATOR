@@ -406,7 +406,15 @@
       }, 'image/png');
       document.body.classList.remove('no-animations');
     }
-
+    function moveFocus(e, nextId) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const nextElement = document.getElementById(nextId);
+        if (nextElement) {
+          nextElement.focus();
+        }
+      }
+    }
     for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
