@@ -15,8 +15,6 @@
       margin: auto;
       background-color: #fff8e1;
       color: #000;
-      overflow-x: hidden;
-      position: relative;
     }
     h2 {
       color: #c7a332;
@@ -74,7 +72,6 @@
       display: block;
       margin: 14px auto;
       font-family: Arial, sans-serif;
-      transition: background-color 0.3s;
     }
     button:hover {
       background-color: #d4b03c;
@@ -96,31 +93,6 @@
     }
     #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
       background-color: #f9e8b3 !important;
-    }
-
-    /* Animations */
-    .slide-in {
-      animation: slideIn 0.3s forwards;
-    }
-    .slide-out {
-      animation: slideOut 0.3s forwards;
-    }
-    @keyframes slideIn {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(0); }
-    }
-    @keyframes slideOut {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-
-    /* Page transition for "AC" button */
-    .page-transition {
-      animation: slideDown 0.3s forwards;
-    }
-    @keyframes slideDown {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(100%); }
     }
   </style>
 </head>
@@ -185,8 +157,6 @@
       const rowCount = tableBody.rows.length;
       const row = document.createElement("tr");
 
-      row.classList.add('slide-in'); // Add sliding animation
-
       row.innerHTML = `
         <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
         <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
@@ -198,27 +168,70 @@
     function removeRow() {
       const tableBody = document.getElementById("data-rows");
       if (tableBody.rows.length > 0) {
-        const lastRow = tableBody.rows[tableBody.rows.length - 1];
-        lastRow.classList.add('slide-out'); // Add slide-out animation
-        setTimeout(() => tableBody.deleteRow(tableBody.rows.length - 1), 300); // Remove row after animation
+        tableBody.deleteRow(tableBody.rows.length - 1);
+      }
+    }
+
+    function calculateNetWeight() {
+      const weights = document.querySelectorAll('.weight');
+      const purities = document.querySelectorAll('.purity');
+      const nets = document.querySelectorAll('.net');
+
+      let totalWeight = 0;
+      let totalNet = 0;
+
+      for (let i = 0; i < weights.length; i++) {
+        const weight = parseFloat(weights[i].value) || 0;
+        const purity = parseFloat(purities[i].value) || 0;
+        const net = weight * purity / 999;
+        nets[i].value = net.toFixed(2);
+        totalWeight += weight;
+        totalNet += net;
+      }
+
+      document.getElementById('total-weight').value = totalWeight.toFixed(2);
+      document.getElementById('total-net').value = totalNet.toFixed(2);
+      if (totalWeight > 0) {
+        const avgPurity = (totalNet / totalWeight) * 999;
+        document.getElementById('avg-purity').value = avgPurity.toFixed(1);
+      } else {
+        document.getElementById('avg-purity').value = '';
+      }
+
+      calculateWeightNeeded();
+    }
+
+    function calculateWeightNeeded() {
+      const W1 = parseFloat(document.getElementById('total-weight').value);
+      const P1 = parseFloat(document.getElementById('avg-purity').value);
+      const Pt = parseFloat(document.getElementById('target-purity').value);
+      const P2 = parseFloat(document.getElementById('available-purity').value);
+
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && !isNaN(P2) && P2 !== Pt) {
+        const W2 = (W1 * (Pt - P1)) / (P2 - Pt);
+        document.getElementById('weight-needed').value = W2 > 0 ? W2.toFixed(2) : '0.00';
+      } else {
+        document.getElementById('weight-needed').value = '';
+      }
+
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && Pt !== 0) {
+        const copperW = (W1 * (P1 - Pt)) / Pt;
+        document.getElementById('copper-needed').value = copperW > 0 ? copperW.toFixed(2) : '0.00';
+      } else {
+        document.getElementById('copper-needed').value = '';
       }
     }
 
     function clearAll() {
-      document.body.classList.add('page-transition'); // Add page transition
-      setTimeout(() => {
-        document.body.classList.remove('page-transition'); // Remove transition
-        // Reset values after transition
-        document.getElementById('target-purity').value = '';
-        document.getElementById('available-purity').value = '';
-        document.getElementById('weight-needed').value = '';
-        document.getElementById('copper-needed').value = '';
-        document.getElementById('total-weight').value = '';
-        document.getElementById('total-net').value = '';
-        document.getElementById('avg-purity').value = '';
-        document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
-        document.querySelectorAll('.net').forEach(net => net.value = '');
-      }, 300); // Wait for the animation to finish
+      document.getElementById('target-purity').value = '';
+      document.getElementById('available-purity').value = '';
+      document.getElementById('weight-needed').value = '';
+      document.getElementById('copper-needed').value = '';
+      document.getElementById('total-weight').value = '';
+      document.getElementById('total-net').value = '';
+      document.getElementById('avg-purity').value = '';
+      document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
+      document.querySelectorAll('.net').forEach(net => net.value = '');
     }
 
     function moveFocus(e, nextId) {
