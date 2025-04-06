@@ -98,36 +98,27 @@
       background-color: #f9e8b3 !important;
       color: #000;
     }
-
-    /* Animations for adding and removing rows */
     .fade {
       animation: fadeInOut 0.5s forwards;
     }
-
     @keyframes fadeInOut {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
-
     .slide-right {
       animation: slideInRight 0.5s forwards;
     }
-
     @keyframes slideInRight {
       0% { transform: translateX(100%); }
       100% { transform: translateX(0); }
     }
-
     .slide-left {
       animation: slideOutLeft 0.5s forwards;
     }
-
     @keyframes slideOutLeft {
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
-
-    /* Disable animations class */
     .no-animations * {
       animation: none !important;
       transition: none !important;
@@ -147,6 +138,9 @@
     body.dark-mode th {
       background-color: #444;
     }
+    body.dark-mode td {
+      background-color: #222;
+    }
     body.dark-mode input[type="number"] {
       background-color: #444;
       color: #fff;
@@ -160,7 +154,6 @@
       color: #c7a332;
     }
 
-    /* Dark mode toggle button styles */
     .dark-mode-toggle {
       background-color: transparent;
       border: none;
@@ -172,8 +165,6 @@
     .dark-mode-toggle:hover {
       color: #ffd700;
     }
-
-    /* Adjusted position of dark mode toggle */
     .toggle-container {
       display: flex;
       justify-content: space-between;
@@ -181,14 +172,11 @@
       align-items: center;
       margin-top: 20px;
     }
-
     .input-buttons {
       display: flex;
       justify-content: space-between;
       gap: 10px;
     }
-
-    /* Light Mode Toggle Styles */
     body:not(.dark-mode) .dark-mode-toggle {
       background-color: #c7a332;
       color: white;
@@ -199,8 +187,6 @@
     body:not(.dark-mode) .dark-mode-toggle:hover i {
       color: white;
     }
-
-    /* Net Weight Text Color */
     .net {
       color: #000 !important;
     }
@@ -239,9 +225,7 @@
         <th>Net Weight</th>
       </tr>
     </thead>
-    <tbody id="data-rows">
-      <!-- Rows will be added dynamically -->
-    </tbody>
+    <tbody id="data-rows"></tbody>
     <tfoot>
       <tr>
         <td><input type="number" id="total-weight" class="result" readonly /></td>
@@ -255,10 +239,10 @@
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
     <button onclick="takeScreenshotPage()" title="Save Full Page Screenshot">
-      <i class="fas fa-file-alt"></i> <!-- Font Awesome page icon -->
+      <i class="fas fa-file-alt"></i>
     </button>
     <button onclick="takeScreenshotTable()" title="Save Table Screenshot">
-      <i class="fas fa-table"></i> <!-- Font Awesome table icon -->
+      <i class="fas fa-table"></i>
     </button>
   </div>
 
@@ -366,7 +350,7 @@
       document.getElementById('avg-purity').value = '';
       document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
       document.querySelectorAll('.net').forEach(net => net.value = '');
-      
+
       const table = document.getElementById('data-table');
       table.classList.add('fade');
       setTimeout(() => table.classList.remove('fade'), 500);
@@ -392,6 +376,14 @@
     async function takeScreenshotTable() {
       document.body.classList.add('no-animations');
       const table = document.getElementById('data-table');
+
+      // Force background style for screenshot in dark mode
+      if (document.body.classList.contains('dark-mode')) {
+        table.style.backgroundColor = '#000';
+        table.querySelectorAll('th').forEach(th => th.style.backgroundColor = '#444');
+        table.querySelectorAll('td').forEach(td => td.style.backgroundColor = '#222');
+      }
+
       const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
         const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
@@ -406,6 +398,7 @@
       }, 'image/png');
       document.body.classList.remove('no-animations');
     }
+
     function moveFocus(e, nextId) {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -415,6 +408,7 @@
         }
       }
     }
+
     for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
