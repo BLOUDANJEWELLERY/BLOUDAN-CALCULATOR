@@ -7,7 +7,7 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <style>
     body {
-      font-family: Arial, sans-serif; /* Set to Arial */
+      font-family: Arial, sans-serif;
       padding: 12px;
       max-width: 600px;
       margin: auto;
@@ -17,8 +17,7 @@
     h2 {
       color: #c7a332;
       text-align: center;
-      font-size: 24px;
-      font-weight: 600; /* Bold heading */
+      font-size: 21px;
     }
     table {
       width: 100%;
@@ -38,13 +37,13 @@
       width: 100%;
       box-sizing: border-box;
       padding: 7px;
-      background-color: #fff; /* White background for input */
+      background-color: #fff;
       color: #000;
       border: 1px solid #c7a332;
       font-size: 14px;
     }
     .result {
-      background-color: #f9e8b3; /* Changed to #f9e8b3 */
+      background-color: #f9e8b3;
       font-weight: bold;
     }
     .input-section {
@@ -55,7 +54,7 @@
       padding: 8px;
       margin-bottom: 10px;
       box-sizing: border-box;
-      background-color: #fff; /* White background for input */
+      background-color: #fff;
       border: 1px solid #c7a332;
       font-size: 14px;
     }
@@ -69,7 +68,6 @@
       cursor: pointer;
       display: block;
       margin: 14px auto;
-      font-family: Arial, sans-serif; /* Apply Arial font to buttons */
     }
     button:hover {
       background-color: #d4b03c;
@@ -80,27 +78,18 @@
       color: #c7a332;
       font-size: 15px;
     }
-    .action-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    /* Specific styles for weight needed, copper needed, net weight, total weight, average purity, and total net weight fields */
-    #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
-      background-color: #f9e8b3 !important; /* Set background to #f9e8b3 */
-    }
   </style>
 </head>
 <body>
-  <h2>GOLD CALCULATOR</h2>
-  <button onclick="clearAll()">AC</button>
+  <h2>BLOUDAN CALCULATOR</h2>
+  <button onclick="clearAll()">Clear All</button>
 
   <div class="input-section">
     <label>Target Purity:
-      <input type="number" id="target-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'available-purity')" />
+      <input type="number" inputmode="decimal" id="target-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'available-purity')" />
     </label>
     <label>Available Purity:
-      <input type="number" id="available-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'weight-1')" />
+      <input type="number" inputmode="decimal" id="available-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'weight-1')" />
     </label>
     <label>Weight Needed:
       <input type="number" id="weight-needed" class="result" readonly />
@@ -110,7 +99,7 @@
     </label>
   </div>
 
-  <table id="data-table">
+  <table>
     <thead>
       <tr>
         <th>Weight</th>
@@ -119,7 +108,15 @@
       </tr>
     </thead>
     <tbody id="data-rows">
-      <!-- Initial 6 rows will be dynamically added using script -->
+      <script>
+        for (let i = 0; i < 6; i++) {
+          document.write('<tr>' +
+            `<td><input type="number" inputmode="decimal" class="weight" id="weight-${i + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${i + 1}')"/></td>` +
+            `<td><input type="number" inputmode="decimal" class="purity" id="purity-${i + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${i + 2}')"/></td>` +
+            '<td><input type="number" class="net result" readonly /></td>' +
+            '</tr>');
+        }
+      </script>
     </tbody>
     <tfoot>
       <tr>
@@ -130,36 +127,11 @@
     </tfoot>
   </table>
 
-  <div class="action-buttons">
-    <button onclick="addRow()">+</button>
-    <button onclick="removeRow()">-</button>
-  </div>
-
   <footer>
     Powered by: <strong>BLOUDAN JEWELLERY</strong>
   </footer>
 
   <script>
-    function addRow() {
-      const tableBody = document.getElementById("data-rows");
-      const rowCount = tableBody.rows.length;
-      const row = document.createElement("tr");
-
-      row.innerHTML = `
-        <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
-        <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
-        <td><input type="number" class="net result" readonly /></td>
-      `;
-      tableBody.appendChild(row);
-    }
-
-    function removeRow() {
-      const tableBody = document.getElementById("data-rows");
-      if (tableBody.rows.length > 0) {
-        tableBody.deleteRow(tableBody.rows.length - 1);
-      }
-    }
-
     function calculateNetWeight() {
       const weights = document.querySelectorAll('.weight');
       const purities = document.querySelectorAll('.purity');
@@ -232,11 +204,6 @@
           nextElement.focus();
         }
       }
-    }
-
-    // Initially populate 6 rows
-    for (let i = 0; i < 6; i++) {
-      addRow();
     }
   </script>
 </body>
