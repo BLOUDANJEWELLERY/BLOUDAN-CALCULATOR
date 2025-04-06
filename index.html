@@ -99,30 +99,33 @@
       color: #000;
     }
 
-    /* Animations */
     .fade {
       animation: fadeInOut 0.5s forwards;
     }
+
     @keyframes fadeInOut {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
+
     .slide-right {
       animation: slideInRight 0.5s forwards;
     }
+
     @keyframes slideInRight {
       0% { transform: translateX(100%); }
       100% { transform: translateX(0); }
     }
+
     .slide-left {
       animation: slideOutLeft 0.5s forwards;
     }
+
     @keyframes slideOutLeft {
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
 
-    /* Dark Mode Styles */
     body.dark-mode {
       background-color: #000000;
       color: #fff;
@@ -149,7 +152,6 @@
       color: #c7a332;
     }
 
-    /* Dark mode toggle button styles */
     .dark-mode-toggle {
       background-color: transparent;
       border: none;
@@ -176,12 +178,14 @@
       gap: 10px;
     }
 
-    /* Light Mode Toggle Styles */
     body:not(.dark-mode) .dark-mode-toggle {
       background-color: #c7a332;
       color: white;
     }
     body:not(.dark-mode) .dark-mode-toggle i {
+      color: white;
+    }
+    body:not(.dark-mode) .dark-mode-toggle:hover i {
       color: white;
     }
 
@@ -202,10 +206,10 @@
 
   <div class="input-section">
     <label>Target Purity:
-      <input type="number" id="target-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'available-purity')" />
+      <input type="number" id="target-purity" oninput="calculateNetWeight()" />
     </label>
     <label>Available Purity:
-      <input type="number" id="available-purity" oninput="calculateWeightNeeded()" onkeydown="moveFocus(event, 'weight-1')" />
+      <input type="number" id="available-purity" oninput="calculateNetWeight()" />
     </label>
     <label>Weight Needed:
       <input type="number" id="weight-needed" class="result" readonly />
@@ -223,7 +227,9 @@
         <th>Net Weight</th>
       </tr>
     </thead>
-    <tbody id="data-rows"></tbody>
+    <tbody id="data-rows">
+      <!-- Rows added below -->
+    </tbody>
     <tfoot>
       <tr>
         <td><input type="number" id="total-weight" class="result" readonly /></td>
@@ -251,9 +257,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     let isDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (isDarkMode) {
-      document.body.classList.add('dark-mode');
-    }
+    if (isDarkMode) document.body.classList.add('dark-mode');
 
     function toggleDarkMode() {
       isDarkMode = !isDarkMode;
@@ -261,16 +265,15 @@
       localStorage.setItem('darkMode', isDarkMode);
     }
 
-    function addRow(animate = true) {
+    function addRow() {
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
       const row = document.createElement("tr");
 
-      if (animate) row.classList.add('slide-right');
-
+      row.classList.add('slide-right');
       row.innerHTML = `
-        <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
-        <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
+        <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" /></td>
+        <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" /></td>
         <td><input type="number" class="net result" readonly /></td>
       `;
       tableBody.appendChild(row);
@@ -281,7 +284,10 @@
       if (tableBody.rows.length > 0) {
         const row = tableBody.rows[tableBody.rows.length - 1];
         row.classList.add('slide-left');
-        row.addEventListener('animationend', () => row.remove());
+        row.addEventListener('animationend', () => {
+          row.remove();
+          calculateNetWeight();
+        });
       }
     }
 
@@ -304,12 +310,7 @@
 
       document.getElementById('total-weight').value = totalWeight.toFixed(2);
       document.getElementById('total-net').value = totalNet.toFixed(2);
-      if (totalWeight > 0) {
-        const avgPurity = (totalNet / totalWeight) * 999;
-        document.getElementById('avg-purity').value = avgPurity.toFixed(1);
-      } else {
-        document.getElementById('avg-purity').value = '';
-      }
+      document.getElementById('avg-purity').value = totalWeight > 0 ? ((totalNet / totalWeight) * 999).toFixed(1) : '';
 
       calculateWeightNeeded();
     }
@@ -336,31 +337,19 @@
     }
 
     function clearAll() {
-      document.getElementById('target-purity').value = '';
-      document.getElementById('available-purity').value = '';
-      document.getElementById('weight-needed').value = '';
-      document.getElementById('copper-needed').value = '';
+      document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+      document.querySelectorAll('.net').forEach(net => net.value = '');
       document.getElementById('total-weight').value = '';
       document.getElementById('total-net').value = '';
       document.getElementById('avg-purity').value = '';
-      document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
-      document.querySelectorAll('.net').forEach(net => net.value = '');
-      const table = document.getElementById('data-table');
-      table.classList.add('fade');
-      setTimeout(() => table.classList.remove('fade'), 500);
-    }
-
-    function moveFocus(e, nextId) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const nextElement = document.getElementById(nextId);
-        if (nextElement) nextElement.focus();
-      }
+      document.getElementById('weight-needed').value = '';
+      document.getElementById('copper-needed').value = '';
+      calculateNetWeight();
     }
 
     async function takeScreenshotPage() {
       const canvas = await html2canvas(document.body, { scale: 2 });
-      canvas.toBlob(function(blob) {
+      canvas.toBlob(blob => {
         const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], title: "Screenshot" });
@@ -376,7 +365,7 @@
     async function takeScreenshotTable() {
       const table = document.getElementById('data-table');
       const canvas = await html2canvas(table, { scale: 2 });
-      canvas.toBlob(function(blob) {
+      canvas.toBlob(blob => {
         const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], title: "Screenshot" });
@@ -389,8 +378,8 @@
       }, 'image/png');
     }
 
-    // Add 6 rows without animation on load
-    for (let i = 0; i < 6; i++) addRow(false);
+    // Add default 6 rows on load
+    for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
 </html>
