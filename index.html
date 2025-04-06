@@ -138,8 +138,12 @@
   <div class="action-buttons">
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
-    <button onclick="takeFullPageScreenshot()" title="Save Full Page Screenshot"><i class="fas fa-camera"></i></button>
-    <button onclick="takeTableScreenshot()" title="Save Table Screenshot"><i class="fas fa-camera"></i></button>
+    <button onclick="takeScreenshotPage()" title="Save Full Page Screenshot">
+      <i class="fas fa-file-alt"></i> <!-- Font Awesome page icon -->
+    </button>
+    <button onclick="takeScreenshotTable()" title="Save Table Screenshot">
+      <i class="fas fa-table"></i> <!-- Font Awesome table icon -->
+    </button>
   </div>
 
   <footer>
@@ -240,30 +244,28 @@
       }
     }
 
-    // Capture the full page
-    async function takeFullPageScreenshot() {
+    async function takeScreenshotPage() {
       const canvas = await html2canvas(document.body, { scale: 2 });
       canvas.toBlob(function(blob) {
-        const file = new File([blob], "gold_calculator_full_page_screenshot.png", { type: "image/png" });
+        const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Full Page Screenshot" });
+          navigator.share({ files: [file], title: "Screenshot" });
         } else {
           const link = document.createElement('a');
-          link.download = 'gold_calculator_full_page_screenshot.png';
+          link.download = 'gold_calculator_screenshot.png';
           link.href = URL.createObjectURL(blob);
           link.click();
         }
       }, 'image/png');
     }
 
-    // Capture the table
-    async function takeTableScreenshot() {
+    async function takeScreenshotTable() {
       const table = document.getElementById('data-table');
       const canvas = await html2canvas(table, { scale: 2 });
       canvas.toBlob(function(blob) {
         const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: "Table Screenshot" });
+          navigator.share({ files: [file], title: "Screenshot" });
         } else {
           const link = document.createElement('a');
           link.download = 'gold_calculator_table_screenshot.png';
