@@ -98,6 +98,7 @@
       background-color: #f9e8b3 !important;
       color: #000;
     }
+
     .fade {
       animation: fadeInOut 0.5s forwards;
     }
@@ -105,6 +106,7 @@
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
+
     .slide-right {
       animation: slideInRight 0.5s forwards;
     }
@@ -112,6 +114,7 @@
       0% { transform: translateX(100%); }
       100% { transform: translateX(0); }
     }
+
     .slide-left {
       animation: slideOutLeft 0.5s forwards;
     }
@@ -119,6 +122,7 @@
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
+
     .no-animations * {
       animation: none !important;
       transition: none !important;
@@ -137,9 +141,6 @@
     }
     body.dark-mode th {
       background-color: #444;
-    }
-    body.dark-mode td {
-      background-color: #222;
     }
     body.dark-mode input[type="number"] {
       background-color: #444;
@@ -165,6 +166,7 @@
     .dark-mode-toggle:hover {
       color: #ffd700;
     }
+
     .toggle-container {
       display: flex;
       justify-content: space-between;
@@ -172,11 +174,13 @@
       align-items: center;
       margin-top: 20px;
     }
+
     .input-buttons {
       display: flex;
       justify-content: space-between;
       gap: 10px;
     }
+
     body:not(.dark-mode) .dark-mode-toggle {
       background-color: #c7a332;
       color: white;
@@ -187,6 +191,7 @@
     body:not(.dark-mode) .dark-mode-toggle:hover i {
       color: white;
     }
+
     .net {
       color: #000 !important;
     }
@@ -225,7 +230,8 @@
         <th>Net Weight</th>
       </tr>
     </thead>
-    <tbody id="data-rows"></tbody>
+    <tbody id="data-rows">
+    </tbody>
     <tfoot>
       <tr>
         <td><input type="number" id="total-weight" class="result" readonly /></td>
@@ -358,7 +364,7 @@
 
     async function takeScreenshotPage() {
       document.body.classList.add('no-animations');
-      const canvas = await html2canvas(document.body, { scale: 2 });
+      const canvas = await html2canvas(document.body, { backgroundColor: null, scale: 2 });
       canvas.toBlob(function(blob) {
         const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -374,17 +380,17 @@
     }
 
     async function takeScreenshotTable() {
-      document.body.classList.add('no-animations');
       const table = document.getElementById('data-table');
+      document.body.classList.add('no-animations');
 
-      // Force background style for screenshot in dark mode
+      const originalBg = table.style.backgroundColor;
       if (document.body.classList.contains('dark-mode')) {
         table.style.backgroundColor = '#000';
-        table.querySelectorAll('th').forEach(th => th.style.backgroundColor = '#444');
-        table.querySelectorAll('td').forEach(td => td.style.backgroundColor = '#222');
       }
 
-      const canvas = await html2canvas(table, { scale: 2 });
+      const canvas = await html2canvas(table, { backgroundColor: null, scale: 2 });
+      table.style.backgroundColor = originalBg;
+
       canvas.toBlob(function(blob) {
         const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
