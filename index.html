@@ -94,10 +94,16 @@
     button i.fas {
       font-size: 18px;
     }
+    #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
+      background-color: #f9e8b3 !important;
+      color: #000;
+    }
 
+    /* Animations for adding and removing rows */
     .fade {
       animation: fadeInOut 0.5s forwards;
     }
+
     @keyframes fadeInOut {
       0% { opacity: 0; }
       100% { opacity: 1; }
@@ -106,6 +112,7 @@
     .slide-right {
       animation: slideInRight 0.5s forwards;
     }
+
     @keyframes slideInRight {
       0% { transform: translateX(100%); }
       100% { transform: translateX(0); }
@@ -114,16 +121,19 @@
     .slide-left {
       animation: slideOutLeft 0.5s forwards;
     }
+
     @keyframes slideOutLeft {
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
 
+    /* Disable animations class */
     .no-animations * {
       animation: none !important;
       transition: none !important;
     }
 
+    /* Dark Mode Styles */
     body.dark-mode {
       background-color: #000000;
       color: #fff;
@@ -150,6 +160,7 @@
       color: #c7a332;
     }
 
+    /* Dark mode toggle button styles */
     .dark-mode-toggle {
       background-color: transparent;
       border: none;
@@ -162,6 +173,7 @@
       color: #ffd700;
     }
 
+    /* Adjusted position of dark mode toggle */
     .toggle-container {
       display: flex;
       justify-content: space-between;
@@ -176,11 +188,19 @@
       gap: 10px;
     }
 
+    /* Light Mode Toggle Styles */
     body:not(.dark-mode) .dark-mode-toggle {
       background-color: #c7a332;
       color: white;
     }
+    body:not(.dark-mode) .dark-mode-toggle i {
+      color: white;
+    }
+    body:not(.dark-mode) .dark-mode-toggle:hover i {
+      color: white;
+    }
 
+    /* Net Weight Text Color */
     .net {
       color: #000 !important;
     }
@@ -219,7 +239,9 @@
         <th>Net Weight</th>
       </tr>
     </thead>
-    <tbody id="data-rows"></tbody>
+    <tbody id="data-rows">
+      <!-- Rows will be added dynamically -->
+    </tbody>
     <tfoot>
       <tr>
         <td><input type="number" id="total-weight" class="result" readonly /></td>
@@ -233,19 +255,23 @@
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
     <button onclick="takeScreenshotPage()" title="Save Full Page Screenshot">
-      <i class="fas fa-file-alt"></i>
+      <i class="fas fa-file-alt"></i> <!-- Font Awesome page icon -->
     </button>
     <button onclick="takeScreenshotTable()" title="Save Table Screenshot">
-      <i class="fas fa-table"></i>
+      <i class="fas fa-table"></i> <!-- Font Awesome table icon -->
     </button>
   </div>
 
-  <footer>Powered by: <strong>BLOUDAN JEWELLERY</strong></footer>
+  <footer>
+    Powered by: <strong>BLOUDAN JEWELLERY</strong>
+  </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     let isDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (isDarkMode) document.body.classList.add('dark-mode');
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+    }
 
     function toggleDarkMode() {
       isDarkMode = !isDarkMode;
@@ -257,10 +283,11 @@
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
       const row = document.createElement("tr");
+
       row.classList.add('slide-right');
       row.innerHTML = `
-        <td><input type="number" class="weight" id="weight-${rowCount + 1}" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
-        <td><input type="number" class="purity" id="purity-${rowCount + 1}" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
+        <td><input type="number" class="weight" id="weight-${rowCount + 1}" step="0.01" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"/></td>
+        <td><input type="number" class="purity" id="purity-${rowCount + 1}" step="0.1" oninput="calculateNetWeight()" onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"/></td>
         <td><input type="number" class="net result" readonly /></td>
       `;
       tableBody.appendChild(row);
@@ -283,14 +310,16 @@
       const weights = document.querySelectorAll('.weight');
       const purities = document.querySelectorAll('.purity');
       const nets = document.querySelectorAll('.net');
-      let totalWeight = 0, totalNet = 0;
+
+      let totalWeight = 0;
+      let totalNet = 0;
 
       for (let i = 0; i < weights.length; i++) {
-        const w = parseFloat(weights[i].value) || 0;
-        const p = parseFloat(purities[i].value) || 0;
-        const net = w * p / 999;
+        const weight = parseFloat(weights[i].value) || 0;
+        const purity = parseFloat(purities[i].value) || 0;
+        const net = weight * purity / 999;
         nets[i].value = net.toFixed(2);
-        totalWeight += w;
+        totalWeight += weight;
         totalNet += net;
       }
 
@@ -328,62 +357,51 @@
     }
 
     function clearAll() {
-      document.querySelectorAll('input[type="number"]').forEach(el => el.value = '');
-      document.querySelectorAll('.net').forEach(el => el.value = '');
-      document.getElementById('data-rows').innerHTML = '';
-      for (let i = 0; i < 6; i++) addRow();
+      document.getElementById('target-purity').value = '';
+      document.getElementById('available-purity').value = '';
+      document.getElementById('weight-needed').value = '';
+      document.getElementById('copper-needed').value = '';
+      document.getElementById('total-weight').value = '';
+      document.getElementById('total-net').value = '';
+      document.getElementById('avg-purity').value = '';
+      document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
+      document.querySelectorAll('.net').forEach(net => net.value = '');
+      
+      const table = document.getElementById('data-table');
+      table.classList.add('fade');
+      setTimeout(() => table.classList.remove('fade'), 500);
     }
 
-    function moveFocus(e, nextId) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const nextEl = document.getElementById(nextId);
-        if (nextEl) nextEl.focus();
+    function takeScreenshotPage() {
+      html2canvas(document.body).then((canvas) => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'gold_calculator_page.png';
+        link.click();
+      });
+    }
+
+    function takeScreenshotTable() {
+      const table = document.getElementById('data-table');
+      html2canvas(table).then((canvas) => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'gold_calculator_table.png';
+        link.click();
+      });
+    }
+
+    function moveFocus(event, nextId) {
+      if (event.key === "Enter") {
+        const nextElement = document.getElementById(nextId);
+        if (nextElement) {
+          nextElement.focus();
+        }
       }
     }
 
-    async function takeScreenshotPage() {
-      document.body.classList.add('no-animations');
-      const canvas = await html2canvas(document.body, { backgroundColor: null, scale: 2 });
-      saveCanvas(canvas, 'gold_calculator_screenshot.png');
-      document.body.classList.remove('no-animations');
-    }
+for (let i = 0; i < 6; i++) addRow();
 
-    async function takeScreenshotTable() {
-  const table = document.getElementById('data-table');
-  document.body.classList.add('no-animations');
-
-  const originalBg = table.style.backgroundColor;
-
-  // Only change background to black if dark mode is active
-  if (document.body.classList.contains('dark-mode')) {
-    table.style.backgroundColor = '#000';
-  } else {
-    table.style.backgroundColor = '';
-  }
-
-  const canvas = await html2canvas(table, { backgroundColor: null, scale: 2 });
-
-  // Reset table background
-  table.style.backgroundColor = originalBg;
-
-  canvas.toBlob(blob => {
-    const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], title: "Screenshot" });
-    } else {
-      const link = document.createElement('a');
-      link.download = 'gold_calculator_table_screenshot.png';
-      link.href = URL.createObjectURL(blob);
-      link.click();
-    }
-  }, 'image/png');
-
-  document.body.classList.remove('no-animations');
-}
-
-
-    for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
 </html>
