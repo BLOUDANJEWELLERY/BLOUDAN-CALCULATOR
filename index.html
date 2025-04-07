@@ -259,9 +259,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     let isDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (isDarkMode) {
-      document.body.classList.add('dark-mode');
-    }
+    if (isDarkMode) document.body.classList.add('dark-mode');
 
     function toggleDarkMode() {
       isDarkMode = !isDarkMode;
@@ -365,7 +363,7 @@
     async function takeScreenshotPage() {
       document.body.classList.add('no-animations');
       const canvas = await html2canvas(document.body, { backgroundColor: null, scale: 2 });
-      canvas.toBlob(function(blob) {
+      canvas.toBlob(blob => {
         const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], title: "Screenshot" });
@@ -391,7 +389,7 @@
       const canvas = await html2canvas(table, { backgroundColor: null, scale: 2 });
       table.style.backgroundColor = originalBg;
 
-      canvas.toBlob(function(blob) {
+      canvas.toBlob(blob => {
         const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           navigator.share({ files: [file], title: "Screenshot" });
@@ -402,6 +400,7 @@
           link.click();
         }
       }, 'image/png');
+
       document.body.classList.remove('no-animations');
     }
 
@@ -409,9 +408,7 @@
       if (e.key === "Enter") {
         e.preventDefault();
         const nextElement = document.getElementById(nextId);
-        if (nextElement) {
-          nextElement.focus();
-        }
+        if (nextElement) nextElement.focus();
       }
     }
 
