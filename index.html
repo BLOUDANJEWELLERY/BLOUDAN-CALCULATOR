@@ -6,7 +6,6 @@
   <title>GOLD CALCULATOR</title>
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -94,46 +93,31 @@
     button i.fas {
       font-size: 18px;
     }
-    #weight-needed, #copper-needed, .net, #total-weight, #avg-purity, #total-net {
-      background-color: #f9e8b3 !important;
-      color: #000;
-    }
-
-    /* Animations for adding and removing rows */
     .fade {
       animation: fadeInOut 0.5s forwards;
     }
-
     @keyframes fadeInOut {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
-
     .slide-right {
       animation: slideInRight 0.5s forwards;
     }
-
     @keyframes slideInRight {
       0% { transform: translateX(100%); }
       100% { transform: translateX(0); }
     }
-
     .slide-left {
       animation: slideOutLeft 0.5s forwards;
     }
-
     @keyframes slideOutLeft {
       0% { transform: translateX(0); }
       100% { transform: translateX(-100%); }
     }
-
-    /* Disable animations class */
     .no-animations * {
       animation: none !important;
       transition: none !important;
     }
-
-    /* Dark Mode Styles */
     body.dark-mode {
       background-color: #000000;
       color: #fff;
@@ -159,8 +143,6 @@
     body.dark-mode footer {
       color: #c7a332;
     }
-
-    /* Dark mode toggle button styles */
     .dark-mode-toggle {
       background-color: transparent;
       border: none;
@@ -172,8 +154,6 @@
     .dark-mode-toggle:hover {
       color: #ffd700;
     }
-
-    /* Adjusted position of dark mode toggle */
     .toggle-container {
       display: flex;
       justify-content: space-between;
@@ -181,14 +161,11 @@
       align-items: center;
       margin-top: 20px;
     }
-
     .input-buttons {
       display: flex;
       justify-content: space-between;
       gap: 10px;
     }
-
-    /* Light Mode Toggle Styles */
     body:not(.dark-mode) .dark-mode-toggle {
       background-color: #c7a332;
       color: white;
@@ -199,8 +176,6 @@
     body:not(.dark-mode) .dark-mode-toggle:hover i {
       color: white;
     }
-
-    /* Net Weight Text Color */
     .net {
       color: #000 !important;
     }
@@ -239,9 +214,7 @@
         <th>Net Weight</th>
       </tr>
     </thead>
-    <tbody id="data-rows">
-      <!-- Rows will be added dynamically -->
-    </tbody>
+    <tbody id="data-rows"></tbody>
     <tfoot>
       <tr>
         <td><input type="number" id="total-weight" class="result" readonly /></td>
@@ -255,10 +228,10 @@
     <button onclick="addRow()">+</button>
     <button onclick="removeRow()">-</button>
     <button onclick="takeScreenshotPage()" title="Save Full Page Screenshot">
-      <i class="fas fa-file-alt"></i> <!-- Font Awesome page icon -->
+      <i class="fas fa-file-alt"></i>
     </button>
     <button onclick="takeScreenshotTable()" title="Save Table Screenshot">
-      <i class="fas fa-table"></i> <!-- Font Awesome table icon -->
+      <i class="fas fa-table"></i>
     </button>
   </div>
 
@@ -269,9 +242,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     let isDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (isDarkMode) {
-      document.body.classList.add('dark-mode');
-    }
+    if (isDarkMode) document.body.classList.add('dark-mode');
 
     function toggleDarkMode() {
       isDarkMode = !isDarkMode;
@@ -366,42 +337,58 @@
       document.getElementById('avg-purity').value = '';
       document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
       document.querySelectorAll('.net').forEach(net => net.value = '');
-      
+
       const table = document.getElementById('data-table');
       table.classList.add('fade');
       setTimeout(() => table.classList.remove('fade'), 500);
     }
 
-    function takeScreenshotPage() {
-      html2canvas(document.body).then((canvas) => {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL();
-        link.download = 'gold_calculator_page.png';
-        link.click();
-      });
-    }
-
-    function takeScreenshotTable() {
-      const table = document.getElementById('data-table');
-      html2canvas(table).then((canvas) => {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL();
-        link.download = 'gold_calculator_table.png';
-        link.click();
-      });
-    }
-
-    function moveFocus(event, nextId) {
-      if (event.key === "Enter") {
-        const nextElement = document.getElementById(nextId);
-        if (nextElement) {
-          nextElement.focus();
+    async function takeScreenshotPage() {
+      document.body.classList.add('no-animations');
+      const canvas = await html2canvas(document.body, { backgroundColor: null, scale: 2 });
+      canvas.toBlob(blob => {
+        const file = new File([blob], "gold_calculator_screenshot.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "Screenshot" });
+        } else {
+          const link = document.createElement('a');
+          link.download = 'gold_calculator_screenshot.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
         }
+      });
+      document.body.classList.remove('no-animations');
+    }
+
+    async function takeScreenshotTable() {
+      document.body.classList.add('no-animations');
+      const table = document.getElementById('data-table');
+      const canvas = await html2canvas(table, { backgroundColor: null, scale: 2 });
+
+      canvas.toBlob(blob => {
+        const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "Screenshot" });
+        } else {
+          const link = document.createElement('a');
+          link.download = 'gold_calculator_table_screenshot.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
+        }
+      });
+
+      document.body.classList.remove('no-animations');
+    }
+
+    function moveFocus(e, nextId) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const nextElement = document.getElementById(nextId);
+        if (nextElement) nextElement.focus();
       }
     }
 
-for (let i = 0; i < 6; i++) addRow();
-
+    for (let i = 0; i < 6; i++) addRow();
   </script>
 </body>
 </html>
