@@ -350,32 +350,38 @@
     }
 
     async function takeScreenshotTable() {
-      const table = document.getElementById('data-table');
-      const originalBg = table.style.backgroundColor;
+  const table = document.getElementById('data-table');
+  document.body.classList.add('no-animations');
 
-      if (document.body.classList.contains('dark-mode')) {
-        table.style.backgroundColor = '#000';
-      }
+  const originalBg = table.style.backgroundColor;
 
-      const canvas = await html2canvas(table, { backgroundColor: null, scale: 2 });
-      table.style.backgroundColor = originalBg;
+  // Only change background to black if dark mode is active
+  if (document.body.classList.contains('dark-mode')) {
+    table.style.backgroundColor = '#000';
+  } else {
+    table.style.backgroundColor = '';
+  }
 
-      saveCanvas(canvas, 'gold_calculator_table_screenshot.png');
+  const canvas = await html2canvas(table, { backgroundColor: null, scale: 2 });
+
+  // Reset table background
+  table.style.backgroundColor = originalBg;
+
+  canvas.toBlob(blob => {
+    const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: "Screenshot" });
+    } else {
+      const link = document.createElement('a');
+      link.download = 'gold_calculator_table_screenshot.png';
+      link.href = URL.createObjectURL(blob);
+      link.click();
     }
+  }, 'image/png');
 
-    function saveCanvas(canvas, filename) {
-      canvas.toBlob(blob => {
-        const file = new File([blob], filename, { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], title: filename });
-        } else {
-          const link = document.createElement('a');
-          link.download = filename;
-          link.href = URL.createObjectURL(blob);
-          link.click();
-        }
-      }, 'image/png');
-    }
+  document.body.classList.remove('no-animations');
+}
+
 
     for (let i = 0; i < 6; i++) addRow();
   </script>
