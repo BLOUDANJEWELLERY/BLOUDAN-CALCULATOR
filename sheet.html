@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Enhanced Spreadsheet</title>
+    <title>Enhanced Spreadsheet with Cell Resizing</title>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -253,7 +253,7 @@
             border: 1px solid var(--border);
             padding: 4px 8px;
             min-width: 80px;
-            max-width: 200px;
+            max-width: 500px;
             height: 24px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -261,6 +261,7 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-touch-callout: none;
+            position: relative;
         }
 
         table.sheet th {
@@ -326,6 +327,47 @@
             bottom: -10px;
             right: -10px;
             cursor: nwse-resize;
+        }
+
+        .resize-handle {
+            position: absolute;
+            z-index: 5;
+            background: transparent;
+        }
+
+        .col-resize-handle {
+            top: 0;
+            right: -3px;
+            width: 6px;
+            height: 100%;
+            cursor: col-resize;
+        }
+
+        .row-resize-handle {
+            left: 0;
+            bottom: -3px;
+            height: 6px;
+            width: 100%;
+            cursor: row-resize;
+        }
+
+        .resize-indicator {
+            position: absolute;
+            background: var(--primary);
+            z-index: 100;
+            display: none;
+        }
+
+        .col-resize-indicator {
+            top: 0;
+            width: 2px;
+            height: 100%;
+        }
+
+        .row-resize-indicator {
+            left: 0;
+            height: 2px;
+            width: 100%;
         }
 
         .status-bar {
@@ -417,6 +459,8 @@
             z-index: 10;
             box-sizing: border-box;
             outline: none;
+            resize: none;
+            overflow: hidden;
         }
 
         @media (max-width: 768px) {
@@ -476,7 +520,7 @@
                 <div class="logo-icon">S</div>
                 <div class="logo-text">
                     <h1>Enhanced Spreadsheet</h1>
-                    <div class="subtitle">Fixed navigation & mobile support</div>
+                    <div class="subtitle">Resizable cells & double-click editing</div>
                 </div>
             </div>
             <div class="user-info">
@@ -628,10 +672,12 @@
             <div class="sheet-wrapper" id="sheetWrapper">
                 <div class="selection-rect" id="selectionRect"></div>
                 <div class="touch-selection-handle bottom-right" id="selectionHandle"></div>
+                <div class="resize-indicator col-resize-indicator" id="colResizeIndicator"></div>
+                <div class="resize-indicator row-resize-indicator" id="rowResizeIndicator"></div>
                 <table class="sheet" id="sheetTable"></table>
             </div>
             <div class="selection-help" id="selectionHelp">
-                Tap and hold to select cells • Drag handles to adjust selection
+                Double-click to edit • Drag handles to resize
             </div>
         </div>
 
@@ -674,6 +720,13 @@
             <div class="context-menu-item" data-action="deleteColumn">
                 <span>Delete Column</span>
             </div>
+            <div class="context-menu-divider"></div>
+            <div class="context-menu-item" data-action="resizeRow">
+                <span>Resize Row</span>
+            </div>
+            <div class="context-menu-item" data-action="resizeColumn">
+                <span>Resize Column</span>
+            </div>
         </div>
     </div>
 
@@ -685,6 +738,10 @@
         const MIN_COLS = 5;
         const MAX_ROWS = 500;
         const MAX_COLS = 50;
+        const DEFAULT_CELL_WIDTH = 100;
+        const DEFAULT_CELL_HEIGHT = 24;
+        const MIN_CELL_WIDTH = 50;
+        const MIN_CELL_HEIGHT = 20;
 
         // Global state
         let rows = DEFAULT_ROWS;
@@ -706,12 +763,23 @@
         let isSelectMode = false;
         let touchStartTime = 0;
         let longPressTimer = null;
+        let columnWidths = {};
+        let rowHeights = {};
+        let isResizing = false;
+        let resizeType = null; // 'col' or 'row'
+        let resizeTarget = null;
+        let resizeStartX = 0;
+        let resizeStartY = 0;
+        let resizeStartWidth = 0;
+        let resizeStartHeight = 0;
 
         // DOM elements
         const sheetWrapper = document.getElementById('sheetWrapper');
         const sheetTable = document.getElementById('sheetTable');
         const selectionRect = document.getElementById('selectionRect');
         const selectionHandle = document.getElementById('selectionHandle');
+        const colResizeIndicator = document.getElementById('colResizeIndicator');
+        const rowResizeIndicator = document.getElementById('rowResizeIndicator');
         const activeCellRef = document.getElementById('activeCell');
         const formulaInput = document.getElementById('formulaInput');
         const contextMenu = document.getElementById('contextMenu');
@@ -760,6 +828,14 @@
 
         // Initialize the spreadsheet
         function initSpreadsheet() {
+            // Initialize column widths and row heights
+            for (let col = 1; col <= DEFAULT_COLS; col++) {
+                columnWidths[col] = DEFAULT_CELL_WIDTH;
+            }
+            for (let row = 1; row <= DEFAULT_ROWS; row++) {
+                rowHeights[row] = DEFAULT_CELL_HEIGHT;
+            }
+            
             buildTable();
             setupEventListeners();
             updateStatusBar();
@@ -790,6 +866,14 @@
                 th.className = 'col-header';
                 th.textContent = colToLetter(col);
                 th.dataset.col = col;
+                th.style.width = `${columnWidths[col] || DEFAULT_CELL_WIDTH}px`;
+                
+                // Add column resize handle
+                const colResizeHandle = document.createElement('div');
+                colResizeHandle.className = 'resize-handle col-resize-handle';
+                colResizeHandle.dataset.col = col;
+                th.appendChild(colResizeHandle);
+                
                 headerRow.appendChild(th);
             }
             
@@ -801,12 +885,21 @@
             
             for (let row = 1; row <= rows; row++) {
                 const tr = document.createElement('tr');
+                tr.style.height = `${rowHeights[row] || DEFAULT_CELL_HEIGHT}px`;
                 
                 // Row header
                 const rowHeader = document.createElement('th');
                 rowHeader.className = 'row-header';
                 rowHeader.textContent = row;
                 rowHeader.dataset.row = row;
+                rowHeader.style.height = `${rowHeights[row] || DEFAULT_CELL_HEIGHT}px`;
+                
+                // Add row resize handle
+                const rowResizeHandle = document.createElement('div');
+                rowResizeHandle.className = 'resize-handle row-resize-handle';
+                rowResizeHandle.dataset.row = row;
+                rowHeader.appendChild(rowResizeHandle);
+                
                 tr.appendChild(rowHeader);
                 
                 // Data cells
@@ -815,6 +908,8 @@
                     td.dataset.row = row;
                     td.dataset.col = col;
                     td.dataset.id = getCellId(row, col);
+                    td.style.width = `${columnWidths[col] || DEFAULT_CELL_WIDTH}px`;
+                    td.style.height = `${rowHeights[row] || DEFAULT_CELL_HEIGHT}px`;
                     
                     // Set content if we have data
                     const cellId = getCellId(row, col);
@@ -882,6 +977,11 @@
             // Selection handle events
             selectionHandle.addEventListener('mousedown', handleHandleMouseDown);
             selectionHandle.addEventListener('touchstart', handleHandleTouchStart, { passive: false });
+            
+            // Resize handle events
+            document.addEventListener('mousedown', handleResizeStart);
+            document.addEventListener('mousemove', handleResizeMove);
+            document.addEventListener('mouseup', handleResizeEnd);
             
             // Keyboard events
             document.addEventListener('keydown', handleKeyDown);
@@ -987,6 +1087,145 @@
                 mobileSelectBtn.style.background = '';
                 mobileSelectBtn.style.borderColor = '';
             }
+        }
+
+        // Resize functionality
+        function handleResizeStart(e) {
+            const handle = e.target.closest('.resize-handle');
+            if (!handle) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            isResizing = true;
+            
+            if (handle.classList.contains('col-resize-handle')) {
+                resizeType = 'col';
+                resizeTarget = parseInt(handle.dataset.col);
+                resizeStartX = e.clientX;
+                resizeStartWidth = columnWidths[resizeTarget] || DEFAULT_CELL_WIDTH;
+                
+                // Show resize indicator
+                const headerCell = document.querySelector(`th.col-header[data-col="${resizeTarget}"]`);
+                if (headerCell) {
+                    const rect = headerCell.getBoundingClientRect();
+                    const wrapperRect = sheetWrapper.getBoundingClientRect();
+                    colResizeIndicator.style.left = `${rect.right - wrapperRect.left + sheetWrapper.scrollLeft}px`;
+                    colResizeIndicator.style.top = `${rect.top - wrapperRect.top + sheetWrapper.scrollTop}px`;
+                    colResizeIndicator.style.height = `${rect.height}px`;
+                    colResizeIndicator.style.display = 'block';
+                }
+            } else if (handle.classList.contains('row-resize-handle')) {
+                resizeType = 'row';
+                resizeTarget = parseInt(handle.dataset.row);
+                resizeStartY = e.clientY;
+                resizeStartHeight = rowHeights[resizeTarget] || DEFAULT_CELL_HEIGHT;
+                
+                // Show resize indicator
+                const headerCell = document.querySelector(`th.row-header[data-row="${resizeTarget}"]`);
+                if (headerCell) {
+                    const rect = headerCell.getBoundingClientRect();
+                    const wrapperRect = sheetWrapper.getBoundingClientRect();
+                    rowResizeIndicator.style.top = `${rect.bottom - wrapperRect.top + sheetWrapper.scrollTop}px`;
+                    rowResizeIndicator.style.left = `${rect.left - wrapperRect.left + sheetWrapper.scrollLeft}px`;
+                    rowResizeIndicator.style.width = `${rect.width}px`;
+                    rowResizeIndicator.style.display = 'block';
+                }
+            }
+        }
+
+        function handleResizeMove(e) {
+            if (!isResizing) return;
+            
+            e.preventDefault();
+            
+            if (resizeType === 'col') {
+                const deltaX = e.clientX - resizeStartX;
+                const newWidth = Math.max(MIN_CELL_WIDTH, resizeStartWidth + deltaX);
+                
+                // Update indicator position
+                const headerCell = document.querySelector(`th.col-header[data-col="${resizeTarget}"]`);
+                if (headerCell) {
+                    const rect = headerCell.getBoundingClientRect();
+                    const wrapperRect = sheetWrapper.getBoundingClientRect();
+                    colResizeIndicator.style.left = `${rect.right - wrapperRect.left + sheetWrapper.scrollLeft + deltaX}px`;
+                }
+            } else if (resizeType === 'row') {
+                const deltaY = e.clientY - resizeStartY;
+                const newHeight = Math.max(MIN_CELL_HEIGHT, resizeStartHeight + deltaY);
+                
+                // Update indicator position
+                const headerCell = document.querySelector(`th.row-header[data-row="${resizeTarget}"]`);
+                if (headerCell) {
+                    const rect = headerCell.getBoundingClientRect();
+                    const wrapperRect = sheetWrapper.getBoundingClientRect();
+                    rowResizeIndicator.style.top = `${rect.bottom - wrapperRect.top + sheetWrapper.scrollTop + deltaY}px`;
+                }
+            }
+        }
+
+        function handleResizeEnd(e) {
+            if (!isResizing) return;
+            
+            if (resizeType === 'col') {
+                const deltaX = e.clientX - resizeStartX;
+                const newWidth = Math.max(MIN_CELL_WIDTH, resizeStartWidth + deltaX);
+                
+                // Save previous state for undo
+                const prevState = {
+                    col: resizeTarget,
+                    prevWidth: columnWidths[resizeTarget] || DEFAULT_CELL_WIDTH
+                };
+                
+                // Update column width
+                columnWidths[resizeTarget] = newWidth;
+                
+                // Update all cells in this column
+                document.querySelectorAll(`th.col-header[data-col="${resizeTarget}"], td[data-col="${resizeTarget}"]`).forEach(cell => {
+                    cell.style.width = `${newWidth}px`;
+                });
+                
+                // Save to undo stack
+                saveToUndoStack({
+                    type: 'resizeColumn',
+                    prevState,
+                    newWidth
+                });
+                
+                // Hide indicator
+                colResizeIndicator.style.display = 'none';
+            } else if (resizeType === 'row') {
+                const deltaY = e.clientY - resizeStartY;
+                const newHeight = Math.max(MIN_CELL_HEIGHT, resizeStartHeight + deltaY);
+                
+                // Save previous state for undo
+                const prevState = {
+                    row: resizeTarget,
+                    prevHeight: rowHeights[resizeTarget] || DEFAULT_CELL_HEIGHT
+                };
+                
+                // Update row height
+                rowHeights[resizeTarget] = newHeight;
+                
+                // Update all cells in this row
+                document.querySelectorAll(`th.row-header[data-row="${resizeTarget}"], tr[data-row="${resizeTarget}"]`).forEach(cell => {
+                    cell.style.height = `${newHeight}px`;
+                });
+                
+                // Save to undo stack
+                saveToUndoStack({
+                    type: 'resizeRow',
+                    prevState,
+                    newHeight
+                });
+                
+                // Hide indicator
+                rowResizeIndicator.style.display = 'none';
+            }
+            
+            isResizing = false;
+            resizeType = null;
+            resizeTarget = null;
         }
 
         // Touch event handlers
@@ -1134,6 +1373,11 @@
 
         // Mouse event handlers
         function handleMouseDown(e) {
+            // Check if we're clicking on a resize handle
+            if (e.target.classList.contains('resize-handle')) {
+                return;
+            }
+            
             const cell = e.target.closest('td');
             if (!cell) return;
             
@@ -1317,29 +1561,34 @@
             isEditing = true;
             editCell = cell;
             
-            // Create input element
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = initialChar;
-            input.className = 'edit-input';
+            // Create textarea element for multi-line support
+            const textarea = document.createElement('textarea');
+            textarea.className = 'edit-input';
+            textarea.value = initialChar;
             
             // Position relative to sheet wrapper
             const wrapperRect = sheetWrapper.getBoundingClientRect();
             const cellRect = cell.getBoundingClientRect();
             
-            input.style.left = (cellRect.left - wrapperRect.left + sheetWrapper.scrollLeft) + 'px';
-            input.style.top = (cellRect.top - wrapperRect.top + sheetWrapper.scrollTop) + 'px';
-            input.style.width = (cellRect.width - 4) + 'px';
-            input.style.height = (cellRect.height - 4) + 'px';
+            textarea.style.left = (cellRect.left - wrapperRect.left + sheetWrapper.scrollLeft) + 'px';
+            textarea.style.top = (cellRect.top - wrapperRect.top + sheetWrapper.scrollTop) + 'px';
+            textarea.style.width = (cellRect.width - 4) + 'px';
+            textarea.style.height = (cellRect.height - 4) + 'px';
             
-            sheetWrapper.appendChild(input);
-            input.focus();
-            input.select();
+            sheetWrapper.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            
+            // Auto-resize textarea as user types
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
             
             // Handle input events
-            input.addEventListener('blur', finishEditing);
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
+            textarea.addEventListener('blur', finishEditing);
+            textarea.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     finishEditing();
                     
@@ -1378,10 +1627,10 @@
         function finishEditing() {
             if (!isEditing || !editCell) return;
             
-            const input = sheetWrapper.querySelector('.edit-input');
-            if (!input) return;
+            const textarea = sheetWrapper.querySelector('.edit-input');
+            if (!textarea) return;
             
-            const value = input.value;
+            const value = textarea.value;
             const cellId = editCell.dataset.id;
             
             // Save previous value for undo
@@ -1408,7 +1657,7 @@
             }
             
             // Clean up
-            sheetWrapper.removeChild(input);
+            sheetWrapper.removeChild(textarea);
             isEditing = false;
             editCell = null;
             
@@ -1418,8 +1667,8 @@
         function cancelEditing() {
             if (!isEditing || !editCell) return;
             
-            const input = sheetWrapper.querySelector('.edit-input');
-            if (!input) return;
+            const textarea = sheetWrapper.querySelector('.edit-input');
+            if (!textarea) return;
             
             // Restore original value in formula input
             const cellId = editCell.dataset.id;
@@ -1430,7 +1679,7 @@
             }
             
             // Clean up
-            sheetWrapper.removeChild(input);
+            sheetWrapper.removeChild(textarea);
             isEditing = false;
             editCell = null;
         }
@@ -1669,6 +1918,34 @@
                     break;
                 case 'deleteColumn':
                     deleteColumn();
+                    break;
+                case 'resizeRow':
+                    // Set default row height for selected rows
+                    if (selection.start && selection.end) {
+                        const startRow = Math.min(selection.start.row, selection.end.row);
+                        const endRow = Math.max(selection.start.row, selection.end.row);
+                        
+                        for (let row = startRow; row <= endRow; row++) {
+                            rowHeights[row] = DEFAULT_CELL_HEIGHT;
+                            document.querySelectorAll(`th.row-header[data-row="${row}"], tr[data-row="${row}"]`).forEach(cell => {
+                                cell.style.height = `${DEFAULT_CELL_HEIGHT}px`;
+                            });
+                        }
+                    }
+                    break;
+                case 'resizeColumn':
+                    // Set default column width for selected columns
+                    if (selection.start && selection.end) {
+                        const startCol = Math.min(selection.start.col, selection.end.col);
+                        const endCol = Math.max(selection.start.col, selection.end.col);
+                        
+                        for (let col = startCol; col <= endCol; col++) {
+                            columnWidths[col] = DEFAULT_CELL_WIDTH;
+                            document.querySelectorAll(`th.col-header[data-col="${col}"], td[data-col="${col}"]`).forEach(cell => {
+                                cell.style.width = `${DEFAULT_CELL_WIDTH}px`;
+                            });
+                        }
+                    }
                     break;
             }
             
@@ -1912,10 +2189,12 @@
             rows++;
             
             // Save state for undo
-            const prevState = { rows: rows - 1, cols, cellData: { ...cellData } };
+            const prevState = { rows: rows - 1, cols, cellData: { ...cellData }, rowHeights: { ...rowHeights } };
             
             // Update cell data - shift rows down
             const newCellData = {};
+            const newRowHeights = {};
+            
             Object.keys(cellData).forEach(cellId => {
                 const cell = getCellFromId(cellId);
                 if (cell.row > insertAfter) {
@@ -1925,7 +2204,19 @@
                 }
             });
             
+            // Update row heights
+            for (let row = 1; row <= rows; row++) {
+                if (row <= insertAfter) {
+                    newRowHeights[row] = rowHeights[row];
+                } else if (row === insertAfter + 1) {
+                    newRowHeights[row] = DEFAULT_CELL_HEIGHT;
+                } else {
+                    newRowHeights[row] = rowHeights[row - 1];
+                }
+            }
+            
             cellData = newCellData;
+            rowHeights = newRowHeights;
             buildTable();
             
             // Save to undo stack
@@ -1952,10 +2243,12 @@
             cols++;
             
             // Save state for undo
-            const prevState = { rows, cols: cols - 1, cellData: { ...cellData } };
+            const prevState = { rows, cols: cols - 1, cellData: { ...cellData }, columnWidths: { ...columnWidths } };
             
             // Update cell data - shift columns right
             const newCellData = {};
+            const newColumnWidths = {};
+            
             Object.keys(cellData).forEach(cellId => {
                 const cell = getCellFromId(cellId);
                 if (cell.col > insertAfter) {
@@ -1965,7 +2258,19 @@
                 }
             });
             
+            // Update column widths
+            for (let col = 1; col <= cols; col++) {
+                if (col <= insertAfter) {
+                    newColumnWidths[col] = columnWidths[col];
+                } else if (col === insertAfter + 1) {
+                    newColumnWidths[col] = DEFAULT_CELL_WIDTH;
+                } else {
+                    newColumnWidths[col] = columnWidths[col - 1];
+                }
+            }
+            
             cellData = newCellData;
+            columnWidths = newColumnWidths;
             buildTable();
             
             // Save to undo stack
@@ -1990,10 +2295,12 @@
             }
             
             // Save state for undo
-            const prevState = { rows, cols, cellData: { ...cellData } };
+            const prevState = { rows, cols, cellData: { ...cellData }, rowHeights: { ...rowHeights } };
             
             // Update cell data - shift rows up
             const newCellData = {};
+            const newRowHeights = {};
+            
             Object.keys(cellData).forEach(cellId => {
                 const cell = getCellFromId(cellId);
                 if (cell.row < deleteRow) {
@@ -2004,8 +2311,18 @@
                 // Row to delete is skipped
             });
             
+            // Update row heights
+            for (let row = 1; row < rows; row++) {
+                if (row < deleteRow) {
+                    newRowHeights[row] = rowHeights[row];
+                } else {
+                    newRowHeights[row] = rowHeights[row + 1];
+                }
+            }
+            
             rows--;
             cellData = newCellData;
+            rowHeights = newRowHeights;
             buildTable();
             
             // Save to undo stack
@@ -2030,10 +2347,12 @@
             }
             
             // Save state for undo
-            const prevState = { rows, cols, cellData: { ...cellData } };
+            const prevState = { rows, cols, cellData: { ...cellData }, columnWidths: { ...columnWidths } };
             
             // Update cell data - shift columns left
             const newCellData = {};
+            const newColumnWidths = {};
+            
             Object.keys(cellData).forEach(cellId => {
                 const cell = getCellFromId(cellId);
                 if (cell.col < deleteCol) {
@@ -2044,8 +2363,18 @@
                 // Column to delete is skipped
             });
             
+            // Update column widths
+            for (let col = 1; col < cols; col++) {
+                if (col < deleteCol) {
+                    newColumnWidths[col] = columnWidths[col];
+                } else {
+                    newColumnWidths[col] = columnWidths[col + 1];
+                }
+            }
+            
             cols--;
             cellData = newCellData;
+            columnWidths = newColumnWidths;
             buildTable();
             
             // Save to undo stack
@@ -2137,12 +2466,35 @@
                 case 'deleteRow':
                 case 'deleteColumn':
                     const prevState = isUndo ? action.prevState : 
-                        { rows, cols, cellData: { ...cellData } };
+                        { rows, cols, cellData: { ...cellData }, 
+                          rowHeights: { ...rowHeights }, columnWidths: { ...columnWidths } };
                     
                     rows = prevState.rows;
                     cols = prevState.cols;
                     cellData = { ...prevState.cellData };
+                    rowHeights = { ...prevState.rowHeights };
+                    columnWidths = { ...prevState.columnWidths };
                     buildTable();
+                    break;
+                    
+                case 'resizeColumn':
+                    const colResizeState = isUndo ? action.prevState : { col: action.prevState.col, prevWidth: action.newWidth };
+                    const colWidth = isUndo ? action.prevState.prevWidth : action.newWidth;
+                    
+                    columnWidths[colResizeState.col] = colWidth;
+                    document.querySelectorAll(`th.col-header[data-col="${colResizeState.col}"], td[data-col="${colResizeState.col}"]`).forEach(cell => {
+                        cell.style.width = `${colWidth}px`;
+                    });
+                    break;
+                    
+                case 'resizeRow':
+                    const rowResizeState = isUndo ? action.prevState : { row: action.prevState.row, prevHeight: action.newHeight };
+                    const rowHeight = isUndo ? action.prevState.prevHeight : action.newHeight;
+                    
+                    rowHeights[rowResizeState.row] = rowHeight;
+                    document.querySelectorAll(`th.row-header[data-row="${rowResizeState.row}"], tr[data-row="${rowResizeState.row}"]`).forEach(cell => {
+                        cell.style.height = `${rowHeight}px`;
+                    });
                     break;
             }
             
@@ -2155,10 +2507,20 @@
                 rows = DEFAULT_ROWS;
                 cols = DEFAULT_COLS;
                 cellData = {};
+                columnWidths = {};
+                rowHeights = {};
                 undoStack = [];
                 redoStack = [];
                 selection = { start: null, end: null, isSelecting: false };
                 activeCell = null;
+                
+                // Reset column widths and row heights
+                for (let col = 1; col <= DEFAULT_COLS; col++) {
+                    columnWidths[col] = DEFAULT_CELL_WIDTH;
+                }
+                for (let row = 1; row <= DEFAULT_ROWS; row++) {
+                    rowHeights[row] = DEFAULT_CELL_HEIGHT;
+                }
                 
                 buildTable();
                 updateStatusBar();
@@ -2193,10 +2555,20 @@
                     
                     // Clear existing data
                     cellData = {};
+                    columnWidths = {};
+                    rowHeights = {};
                     
                     // Determine dimensions
                     rows = jsonData.length;
                     cols = Math.max(...jsonData.map(row => row.length));
+                    
+                    // Reset column widths and row heights
+                    for (let col = 1; col <= cols; col++) {
+                        columnWidths[col] = DEFAULT_CELL_WIDTH;
+                    }
+                    for (let row = 1; row <= rows; row++) {
+                        rowHeights[row] = DEFAULT_CELL_HEIGHT;
+                    }
                     
                     // Import data
                     jsonData.forEach((row, rowIndex) => {
