@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Spreadsheet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Enhanced Spreadsheet</title>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -35,6 +35,7 @@
             background: var(--bg);
             color: var(--text);
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         .app-container {
@@ -222,6 +223,7 @@
             border: 1px solid var(--border);
             border-radius: 4px;
             font-family: monospace;
+            font-size: 16px; /* Prevent zoom on mobile */
         }
 
         .sheet-container {
@@ -405,6 +407,18 @@
             z-index: 100;
         }
 
+        .edit-input {
+            position: absolute;
+            border: 2px solid var(--primary);
+            padding: 2px 4px;
+            font-size: 16px; /* Prevent zoom on mobile */
+            font-family: inherit;
+            background: white;
+            z-index: 10;
+            box-sizing: border-box;
+            outline: none;
+        }
+
         @media (max-width: 768px) {
             .toolbar {
                 display: none;
@@ -461,8 +475,8 @@
             <div class="logo">
                 <div class="logo-icon">S</div>
                 <div class="logo-text">
-                    <h1>Mobile Spreadsheet</h1>
-                    <div class="subtitle">Touch-friendly interface</div>
+                    <h1>Enhanced Spreadsheet</h1>
+                    <div class="subtitle">Fixed navigation & mobile support</div>
                 </div>
             </div>
             <div class="user-info">
@@ -718,7 +732,7 @@
             while (col > 0) {
                 temp = (col - 1) % 26;
                 letter = String.fromCharCode(temp + 65) + letter;
-                col = (col - temp - 1) / 26;
+                col = Math.floor((col - temp - 1) / 26);
             }
             return letter;
         }
@@ -875,6 +889,7 @@
             // Formula input
             formulaInput.addEventListener('input', handleFormulaInput);
             formulaInput.addEventListener('blur', handleFormulaBlur);
+            formulaInput.addEventListener('keydown', handleFormulaKeyDown);
             
             // Context menu
             document.addEventListener('contextmenu', handleContextMenu);
@@ -943,6 +958,16 @@
             
             // Direct cell editing
             sheetTable.addEventListener('dblclick', handleDoubleClick);
+            
+            // Prevent zoom on mobile when focusing on inputs
+            document.querySelectorAll('input, textarea, select').forEach(el => {
+                el.addEventListener('focus', () => {
+                    document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=no');
+                });
+                el.addEventListener('blur', () => {
+                    document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=yes');
+                });
+            });
         }
 
         // Set selection mode
@@ -1280,6 +1305,9 @@
             } else {
                 formulaInput.value = cell.textContent || '';
             }
+            
+            // Ensure cell is visible
+            cell.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
         }
 
         // Direct cell editing
@@ -1293,21 +1321,16 @@
             const input = document.createElement('input');
             input.type = 'text';
             input.value = initialChar;
-            input.style.position = 'absolute';
-            input.style.width = cell.offsetWidth + 'px';
-            input.style.height = cell.offsetHeight + 'px';
-            input.style.border = '2px solid var(--primary)';
-            input.style.padding = '2px 4px';
-            input.style.fontSize = 'inherit';
-            input.style.fontFamily = 'inherit';
-            input.style.backgroundColor = 'white';
-            input.style.zIndex = '10';
+            input.className = 'edit-input';
             
             // Position relative to sheet wrapper
             const wrapperRect = sheetWrapper.getBoundingClientRect();
             const cellRect = cell.getBoundingClientRect();
+            
             input.style.left = (cellRect.left - wrapperRect.left + sheetWrapper.scrollLeft) + 'px';
             input.style.top = (cellRect.top - wrapperRect.top + sheetWrapper.scrollTop) + 'px';
+            input.style.width = (cellRect.width - 4) + 'px';
+            input.style.height = (cellRect.height - 4) + 'px';
             
             sheetWrapper.appendChild(input);
             input.focus();
@@ -1320,11 +1343,27 @@
                     e.preventDefault();
                     finishEditing();
                     
-                    // Move to next cell
+                    // Move to next cell (down)
                     const row = parseInt(cell.dataset.row);
                     const col = parseInt(cell.dataset.col);
                     if (row < rows) {
                         navigateToCell(row + 1, col);
+                    }
+                } else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    finishEditing();
+                    const row = parseInt(cell.dataset.row);
+                    const col = parseInt(cell.dataset.col);
+                    if (e.shiftKey) {
+                        // Move left
+                        if (col > 1) {
+                            navigateToCell(row, col - 1);
+                        }
+                    } else {
+                        // Move right
+                        if (col < cols) {
+                            navigateToCell(row, col + 1);
+                        }
                     }
                 } else if (e.key === 'Escape') {
                     e.preventDefault();
@@ -1339,7 +1378,7 @@
         function finishEditing() {
             if (!isEditing || !editCell) return;
             
-            const input = sheetWrapper.querySelector('input');
+            const input = sheetWrapper.querySelector('.edit-input');
             if (!input) return;
             
             const value = input.value;
@@ -1379,7 +1418,7 @@
         function cancelEditing() {
             if (!isEditing || !editCell) return;
             
-            const input = sheetWrapper.querySelector('input');
+            const input = sheetWrapper.querySelector('.edit-input');
             if (!input) return;
             
             // Restore original value in formula input
@@ -1416,7 +1455,7 @@
                 updateStatusBar();
                 
                 // Ensure cell is visible
-                cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                cell.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
             }
         }
 
@@ -1424,11 +1463,20 @@
         function handleKeyDown(e) {
             if (!activeCell) return;
             
+            // If we're editing, let the input handle the keys
+            if (isEditing) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelEditing();
+                }
+                return;
+            }
+            
             const row = parseInt(activeCell.dataset.row);
             const col = parseInt(activeCell.dataset.col);
             
             // Direct editing - if a printable key is pressed and we're not already editing
-            if (!isEditing && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
                 e.preventDefault();
                 startDirectEditing(activeCell, e.key);
                 return;
@@ -1462,16 +1510,7 @@
                     break;
                 case 'Enter':
                     e.preventDefault();
-                    if (isEditing) {
-                        finishEditing();
-                        if (e.shiftKey) {
-                            if (row > 1) navigateToCell(row - 1, col);
-                        } else {
-                            if (row < rows) navigateToCell(row + 1, col);
-                        }
-                    } else {
-                        startDirectEditing(activeCell, '');
-                    }
+                    startDirectEditing(activeCell, '');
                     break;
                 case 'Escape':
                     if (isEditing) {
@@ -1515,6 +1554,41 @@
                         redo();
                     }
                     break;
+            }
+        }
+
+        // Formula input key handling
+        function handleFormulaKeyDown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                formulaInput.blur();
+                
+                // Move to next cell (down)
+                if (activeCell) {
+                    const row = parseInt(activeCell.dataset.row);
+                    const col = parseInt(activeCell.dataset.col);
+                    if (row < rows) {
+                        navigateToCell(row + 1, col);
+                    }
+                }
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                formulaInput.blur();
+                
+                // Move to next cell (right)
+                if (activeCell) {
+                    const row = parseInt(activeCell.dataset.row);
+                    const col = parseInt(activeCell.dataset.col);
+                    if (e.shiftKey) {
+                        if (col > 1) {
+                            navigateToCell(row, col - 1);
+                        }
+                    } else {
+                        if (col < cols) {
+                            navigateToCell(row, col + 1);
+                        }
+                    }
+                }
             }
         }
 
@@ -1988,6 +2062,11 @@
         function saveToUndoStack(action) {
             undoStack.push(action);
             redoStack = []; // Clear redo stack when new action is performed
+            
+            // Limit undo stack size
+            if (undoStack.length > 50) {
+                undoStack.shift();
+            }
         }
 
         function undo() {
