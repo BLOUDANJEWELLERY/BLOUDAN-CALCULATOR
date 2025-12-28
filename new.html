@@ -1095,7 +1095,7 @@ body::before {
             <div class="input-group">
               <label>Target Purity:</label>
               <input type="number" id="target-purity" class="input-field" 
-                     oninput="calculateWeightNeeded()" 
+                     oninput="handleInputChange()" 
                     inputmode="decimal"
                      onkeydown="moveFocus(event, 'available-purity')"
                      placeholder="Enter target purity" />
@@ -1108,7 +1108,7 @@ body::before {
             <div class="input-group">
               <label>Available Purity:</label>
               <input type="number" id="available-purity" class="input-field" 
-                     oninput="calculateWeightNeeded()" 
+                     oninput="handleInputChange()" 
                     inputmode="decimal"
                      onkeydown="moveFocus(event, 'weight-1')"
                      placeholder="Enter available purity" />
@@ -1292,7 +1292,138 @@ body::before {
         mode === 'gold' ? 'none' : 'block';
     }
 
-    // Top Notification System
+    // ===============================
+    // AUTO-SAVE DRAFT SYSTEM
+    // ===============================
+    const DRAFT_KEY = 'goldCalculatorDraft';
+    let draftSaveTimeout = null;
+    let isRestoringDraft = false;
+
+    // Debounced function to save draft
+    function saveDraft() {
+      if (isRestoringDraft) return;
+      
+      if (draftSaveTimeout) {
+        clearTimeout(draftSaveTimeout);
+      }
+      
+      draftSaveTimeout = setTimeout(() => {
+        // Get current calculation data
+        const targetPurity = document.getElementById('target-purity').value;
+        const availablePurity = document.getElementById('available-purity').value;
+        const weightNeeded = document.getElementById('weight-needed').value;
+        const copperNeeded = document.getElementById('copper-needed').value;
+        const totalWeight = document.getElementById('total-weight').value;
+        const totalNet = document.getElementById('total-net').value;
+        const avgPurity = document.getElementById('avg-purity').value;
+
+        // Get table data
+        const tableData = [];
+        const rows = document.querySelectorAll('#data-rows tr');
+        rows.forEach(row => {
+          const purity = row.querySelector('.purity').value;
+          const weight = row.querySelector('.weight').value;
+          const net = row.querySelector('.net').value;
+          tableData.push({ purity, weight, net });
+        });
+
+        // Create draft item
+        const draft = {
+          id: 'draft_' + Date.now(),
+          date: new Date().toLocaleString(),
+          targetPurity,
+          availablePurity,
+          weightNeeded,
+          copperNeeded,
+          totalWeight,
+          totalNet,
+          avgPurity,
+          tableData,
+          timestamp: new Date().toISOString()
+        };
+
+        // Save to localStorage
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        console.log('Draft auto-saved');
+      }, 1000); // 1 second debounce
+    }
+
+    // Restore draft on page load
+    function restoreDraft() {
+      isRestoringDraft = true;
+      
+      const draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
+      if (!draft) {
+        // Initialize with default rows if no draft
+        for (let i = 0; i < 3; i++) addRow();
+        isRestoringDraft = false;
+        return;
+      }
+
+      // Load the data into the calculator
+      document.getElementById('target-purity').value = draft.targetPurity || '';
+      document.getElementById('available-purity').value = draft.availablePurity || '';
+      document.getElementById('weight-needed').value = draft.weightNeeded || '';
+      document.getElementById('copper-needed').value = draft.copperNeeded || '';
+      document.getElementById('total-weight').value = draft.totalWeight || '';
+      document.getElementById('total-net').value = draft.totalNet || '';
+      document.getElementById('avg-purity').value = draft.avgPurity || '';
+
+      // Clear existing rows
+      const tableBody = document.getElementById("data-rows");
+      tableBody.innerHTML = '';
+
+      // Add rows from draft
+      if (draft.tableData && draft.tableData.length > 0) {
+        draft.tableData.forEach((rowData, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>
+              <input type="number" inputmode="decimal" class="table-input purity" id="purity-${index + 1}" 
+                     step="0.1" oninput="handleInputChange()" 
+                     value="${rowData.purity || ''}"
+                     placeholder="0.0" />
+            </td>
+            <td>
+              <input type="number" inputmode="decimal" class="table-input weight" id="weight-${index + 1}" 
+                     step="0.01" oninput="handleInputChange()" 
+                     value="${rowData.weight || ''}"
+                     placeholder="0.00" />
+            </td>
+            <td>
+              <input type="number" inputmode="decimal" class="table-input result net" 
+                     value="${rowData.net || ''}" readonly />
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } else {
+        // Add default rows if no table data
+        for (let i = 0; i < 3; i++) addRow();
+      }
+
+      // Recalculate
+      calculateNetWeight();
+      calculateWeightNeeded();
+      
+      isRestoringDraft = false;
+      console.log('Draft restored');
+    }
+
+    // Clear draft
+    function clearDraft() {
+      localStorage.removeItem(DRAFT_KEY);
+    }
+
+    // Handler for input changes to trigger auto-save
+    function handleInputChange() {
+      calculateWeightNeeded();
+      saveDraft();
+    }
+
+    // ===============================
+    // TOP NOTIFICATION SYSTEM
+    // ===============================
     function showNotification(type, title, message, options = {}) {
       const container = document.getElementById('notification-container');
       const id = 'notification-' + Date.now();
@@ -1325,6 +1456,7 @@ body::before {
       
       container.innerHTML += notificationHtml;
       
+      // Force reflow before adding show class
       setTimeout(() => {
         const notification = document.getElementById(id);
         notification.classList.add('show');
@@ -1372,8 +1504,10 @@ body::before {
       });
     }
     
+    // FIXED: Show Clear Data Confirmation
     function showClearDataConfirmation() {
-      const id = showNotification('warning', 'Clear All Data', 'Are you sure you want to clear all calculation data? This action cannot be undone.', {
+      const id = 'clear-data-' + Date.now();
+      showNotification('warning', 'Clear All Data', 'Are you sure you want to clear all calculation data? This action cannot be undone.', {
         buttons: [
           {
             text: 'Yes, Clear All',
@@ -1387,12 +1521,15 @@ body::before {
             icon: 'fas fa-times',
             onclick: `hideNotification('${id}')`
           }
-        ]
+        ],
+        persistent: true
       });
     }
     
+    // FIXED: Show Clear History Confirmation
     function showClearHistoryConfirmation() {
-      const id = showNotification('danger', 'Clear All History', 'Are you sure you want to clear ALL calculation history? This action cannot be undone.', {
+      const id = 'clear-history-' + Date.now();
+      showNotification('danger', 'Clear All History', 'Are you sure you want to clear ALL calculation history? This action cannot be undone.', {
         buttons: [
           {
             text: 'Yes, Delete All',
@@ -1406,11 +1543,14 @@ body::before {
             icon: 'fas fa-times',
             onclick: `hideNotification('${id}')`
           }
-        ]
+        ],
+        persistent: true
       });
     }
 
-    // History Management Functions
+    // ===============================
+    // HISTORY MANAGEMENT FUNCTIONS
+    // ===============================
     const HISTORY_KEY = 'goldCalculatorHistory';
     const MAX_HISTORY_ITEMS = 50;
 
@@ -1581,13 +1721,13 @@ body::before {
           row.innerHTML = `
             <td>
               <input type="number" inputmode="decimal" class="table-input purity" id="purity-${index + 1}" 
-                     step="0.1" oninput="calculateNetWeight()" 
+                     step="0.1" oninput="handleInputChange()" 
                      value="${rowData.purity || ''}"
                      placeholder="0.0" />
             </td>
             <td>
               <input type="number" inputmode="decimal" class="table-input weight" id="weight-${index + 1}" 
-                     step="0.01" oninput="calculateNetWeight()" 
+                     step="0.01" oninput="handleInputChange()" 
                      value="${rowData.weight || ''}"
                      placeholder="0.00" />
             </td>
@@ -1607,6 +1747,9 @@ body::before {
       calculateNetWeight();
       calculateWeightNeeded();
       
+      // Auto-save draft
+      saveDraft();
+      
       // Close history modal
       hideHistory();
       
@@ -1614,10 +1757,9 @@ body::before {
       showSuccessLoad();
     }
 
-    // Gold Calculator Functions
-    // Initialize with some rows
-    for (let i = 0; i < 3; i++) addRow();
-
+    // ===============================
+    // GOLD CALCULATOR FUNCTIONS
+    // ===============================
     function addRow() {
       const tableBody = document.getElementById("data-rows");
       const rowCount = tableBody.rows.length;
@@ -1627,13 +1769,13 @@ body::before {
       row.innerHTML = `
        <td>
           <input type="number" inputmode="decimal" class="table-input purity" id="purity-${rowCount + 1}" 
-                 step="0.1" oninput="calculateNetWeight()" 
+                 step="0.1" oninput="handleInputChange()" 
                  onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"
                  placeholder="0.0" />
         </td>
         <td>
           <input type="number" inputmode="decimal" class="table-input weight" id="weight-${rowCount + 1}" 
-                 step="0.01" oninput="calculateNetWeight()" 
+                 step="0.01" oninput="handleInputChange()" 
                  onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"
                  placeholder="0.00" />
         </td>
@@ -1642,6 +1784,9 @@ body::before {
         </td>
       `;
       tableBody.appendChild(row);
+      
+      // Auto-save after adding row
+      saveDraft();
     }
 
     function removeRow() {
@@ -1653,6 +1798,8 @@ body::before {
           row.remove();
           calculateNetWeight();
           calculateWeightNeeded();
+          // Auto-save after removing row
+          saveDraft();
         });
       }
     }
@@ -1718,6 +1865,9 @@ body::before {
       document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
       document.querySelectorAll('.net').forEach(net => net.value = '');
 
+      // Clear draft
+      clearDraft();
+      
       const table = document.getElementById('data-table');
       table.classList.add('fade');
       setTimeout(() => table.classList.remove('fade'), 500);
@@ -1727,7 +1877,9 @@ body::before {
       });
     }
 
-    // Normal Calculator Functions - FIXED CONTINUATION BEHAVIOR
+    // ===============================
+    // NORMAL CALCULATOR FUNCTIONS
+    // ===============================
     let currentInput = '0';
     let isNewCalculation = true;
     let lastResult = null;
@@ -1895,53 +2047,55 @@ body::before {
     // Initialize calculator display
     updateDisplay();
 
-    // Common Functions
-async function takeScreenshotPage() {
-  document.body.classList.add('no-animations');
-  
-  // Add temporary spacing if content is too short
-  const originalContainerStyle = document.querySelector('.container').style.minHeight;
-  const isContentShort = document.body.scrollHeight < window.innerHeight * 0.8;
-  
-  if (isContentShort) {
-    document.querySelector('.container').style.minHeight = '70vh';
-    // Force reflow
-    await new Promise(resolve => setTimeout(resolve, 50));
-  }
-  
-  try {
-    const canvas = await html2canvas(document.body, { 
-      backgroundColor: '#ffffff',
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: document.documentElement.scrollWidth,
-      windowHeight: document.documentElement.scrollHeight
-    });
-    
-    canvas.toBlob(blob => {
-      const file = new File([blob], "calculator_screenshot.png", { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: "Calculator Screenshot" });
-      } else {
-        const link = document.createElement('a');
-        link.download = 'calculator_screenshot.png';
-        link.href = URL.createObjectURL(blob);
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(link.href), 100);
+    // ===============================
+    // COMMON FUNCTIONS
+    // ===============================
+    async function takeScreenshotPage() {
+      document.body.classList.add('no-animations');
+      
+      // Add temporary spacing if content is too short
+      const originalContainerStyle = document.querySelector('.container').style.minHeight;
+      const isContentShort = document.body.scrollHeight < window.innerHeight * 0.8;
+      
+      if (isContentShort) {
+        document.querySelector('.container').style.minHeight = '70vh';
+        // Force reflow
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
-    }, 'image/png');
-  } catch (error) {
-    console.error('Screenshot failed:', error);
-    alert('Failed to capture screenshot. Please try again.');
-  } finally {
-    // Restore original styles
-    document.querySelector('.container').style.minHeight = originalContainerStyle;
-    document.body.classList.remove('no-animations');
-  }
-}
+      
+      try {
+        const canvas = await html2canvas(document.body, { 
+          backgroundColor: '#ffffff',
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: document.documentElement.scrollWidth,
+          windowHeight: document.documentElement.scrollHeight
+        });
+        
+        canvas.toBlob(blob => {
+          const file = new File([blob], "calculator_screenshot.png", { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: "Calculator Screenshot" });
+          } else {
+            const link = document.createElement('a');
+            link.download = 'calculator_screenshot.png';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+          }
+        }, 'image/png');
+      } catch (error) {
+        console.error('Screenshot failed:', error);
+        alert('Failed to capture screenshot. Please try again.');
+      } finally {
+        // Restore original styles
+        document.querySelector('.container').style.minHeight = originalContainerStyle;
+        document.body.classList.remove('no-animations');
+      }
+    }
 
     async function takeScreenshotTable() {
       if (currentMode !== 'gold') return;
@@ -1983,6 +2137,15 @@ async function takeScreenshotPage() {
         hideHistory();
       }
     });
+
+    // ===============================
+    // INITIALIZATION
+    // ===============================
+    // Restore draft on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      restoreDraft();
+    });
+
   </script>
   <script>
 function setViewportHeight() {
