@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gold Calculator | Bloudan Jewellery</title>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#011d57" />
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./service-worker-v7.js")
+      .then(() => console.log("SW registered"))
+      .catch((err) => console.error("SW registration failed:", err));
+  });
+}
+
+</script>
+  <link rel="apple-touch-icon" href="Icons/Icon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="Icons/Icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  color: #1e293b;
+  font-size: 14px;
+  background: linear-gradient(
+    to bottom,
+    #fef3c7 0%,
+    #f8fafc 25%,
+    #fef3c7 50%,
+    #f8fafc 75%,
+    #fef3c7 100%
+  );
+  max-width: 800px;
+  margin: 0 auto;
+  height: 100vh; /* fallback */
+  height: var(--vh, 100vh); /* use real viewport height if set */
+}
+
+/* Ensure proper rendering for screenshot */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, #fef3c7, #f8fafc);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Improve header/footer rendering for screenshots */
+.header, footer {
+  position: relative;
+  z-index: 10;
+}
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 12px;
+        background: transparent;
+  position: relative;
+  z-index: 1;
+      
+    }
+
+    /* Header Section */
+    .header {
+    user-select: none;                  /* select-none */
+  position: sticky;                   /* sticky */
+  top: 0;                             /* top-0 */
+  background: linear-gradient(to right, #1d4ed8, #c7a332); /* bg-gradient-to-r from-[#1d4ed8] to-[#c7a332] */
+  color: white;                       /* text-white */
+  display: flex;                      /* flex */
+  justify-content: center;            /* justify-center */
+  align-items: center;                /* items-center */
+  padding: 0.5rem 1.25rem;              /* py-4 px-5 */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* shadow-md approximation */
+  z-index: 60; 
+  margin-bottom: 15px;
+    }
+
+    .header h1 {
+        font-family: serif;                 /* font-serif */
+  font-size: 3.25rem;                 /* text-4xl */
+  letter-spacing: 0.05em;             /* tracking-wide approximation */
+  margin: 0;
+    }
+
+    .gold-line {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #f59e0b, #eab308, #d97706);
+      margin: 0 auto 20px;
+      border-radius: 2px;
+    }
+
+    /* Mode Toggle Switch */
+    .mode-toggle-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .mode-toggle {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 4px;
+      border: 1.5px solid #e2e8f0;
+    }
+
+    .mode-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: transparent;
+      color: #64748b;
+      min-width: 120px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, #f59e0b, #eab308, #d97706);
+      color: white;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Toggle Container */
+    .toggle-container {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #eab308, #d97706);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Gold Calculator Styles */
+    .gold-calculator {
+      display: block;
+    }
+
+    .normal-calculator {
+      display: none;
+      touch-action: manipulation;
+      padding: 12px;
+      height: 100vh; /* fallback */
+  height: var(--vh, 100vh); /* use real viewport height if set */
+    }
+
+    /* Input Cards */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 640px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+
+    .input-card {
+      position: relative;
+      padding: 1.5px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f59e0b, #eab308, #d97706);
+    }
+
+    .input-card-inner {
+      background: linear-gradient(135deg, #ffffff, #f8fafc);
+      border-radius: 10px;
+      padding: 16px;
+      height: 100%;
+    }
+
+    .input-group {
+      margin-bottom: 0;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      background: white;
+      color: #1e293b;
+      transition: all 0.3s ease;
+      min-height: 42px;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.1);
+    }
+
+    .input-field.result {
+      background: linear-gradient(135deg, #fef3c7, #fef9c3);
+      border-color: #f59e0b;
+      color: #92400e;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    /* Table Styling - More Compact */
+    .table-container {
+      position: relative;
+      padding: 1.5px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f59e0b, #eab308, #d97706);
+      margin-bottom: 20px;
+    }
+
+    .table-inner {
+      background: white;
+      border-radius: 10px;
+      padding: 2px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background: linear-gradient(135deg, #fef3c7, #fef9c3);
+      padding: 12px 8px;
+      text-align: center;
+      font-weight: 700;
+      color: #92400e;
+      border-bottom: 2px solid #f59e0b;
+      font-size: 12px;
+    }
+
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tfoot td {
+      background: linear-gradient(135deg, #fef3c7, #fef9c3);
+      border-bottom: none;
+      font-weight: 600;
+      padding: 10px 8px;
+    }
+
+    /* Table input fields - optimized for mobile */
+    .table-input {
+      width: 100%;
+      padding: 8px 6px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+      color: #1e293b;
+      min-height: 36px;
+      text-align: center;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+
+    .table-input:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.1);
+    }
+
+    .table-input.result {
+      background: linear-gradient(135deg, #fef3c7, #fef9c3);
+      border-color: #f59e0b;
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    /* Normal Calculator Styles - UPDATED */
+    .calculator-display-container {
+      background: #1e293b;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      touch-action: manipulation;
+    }
+
+    .calculator-current-input {
+      font-size: 1.8rem;
+      font-weight: 300;
+      text-align: right;
+      word-break: break-all;
+      margin-bottom: 8px;
+      min-height: 2.2rem;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .calculator-live-result {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      text-align: right;
+      word-break: break-all;
+      min-height: 1.4rem;
+      font-weight: 400;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .calculator-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+      touch-action: manipulation;
+    }
+
+    .calc-btn {
+      touch-action: manipulation;
+  user-select: none;
+      padding: 16px 8px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: white;
+      color: #1e293b;
+      border: 1.5px solid #e2e8f0;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .calc-btn:hover {
+      transform: translateY(-2px);
+      transition: transform 0.05s ease; /* fast feedback */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .calc-btn.operator {
+      background: linear-gradient(135deg, #f59e0b, #eab308);
+      color: white;
+      border: none;
+    }
+
+    .calc-btn.equals {
+      background: linear-gradient(135deg, #1e3a8a, #3730a3);
+      color: white;
+      border: none;
+    }
+
+    .calc-btn.clear {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      border: none;
+    }
+
+    .calc-btn.backspace {
+      background: linear-gradient(135deg, #6b7280, #9ca3af);
+      color: white;
+      border: none;
+    }
+
+    .calc-btn.zero {
+      grid-column: span 2;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 24px 0;
+      flex-wrap: wrap;
+    }
+
+/* 🌊 Base Save Button */
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #fff;
+  min-height: 40px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #60a5fa 100%);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action-btn:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 60%, #93c5fd 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+/* ✅ Add Button — Deep Mint Gradient */
+.action-btn.add {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 60%, #99f6e4 100%);
+  color: #fff;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  box-shadow: 0 2px 4px rgba(13, 148, 136, 0.25);
+  transition: all 0.25s ease;
+}
+
+.action-btn.add:hover {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #5eead4 100%);
+  box-shadow: 0 4px 10px rgba(13, 148, 136, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ❌ Remove Button — Rich Professional Red */
+.action-btn.remove {
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 60%, #fca5a5 100%);
+  color: #fff;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.25);
+  transition: all 0.25s ease;
+}
+
+.action-btn.remove:hover {
+  background: linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #f87171 100%);
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
+  transform: translateY(-1px);
+}
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px 16px;
+      background: linear-gradient(90deg, #1d4ed8, #c7a332);
+      color: white;
+      border-top: 1px solid #334155;
+      border-radius: 0px;
+      margin-top: 32px;
+      bottom: 0;
+    }
+
+    footer p {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Animations */
+    .fade {
+      animation: fadeInOut 0.5s forwards;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .slide-right {
+      animation: slideInRight 0.3s forwards;
+    }
+
+    @keyframes slideInRight {
+      0% { transform: translateX(100%); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    .slide-left {
+      animation: slideOutLeft 0.3s forwards;
+    }
+
+    @keyframes slideOutLeft {
+      0% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(-100%); opacity: 0; }
+    }
+
+    .no-animations * {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    /* History Modal Styles */
+    .history-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .history-modal.active {
+      display: flex;
+    }
+
+    .history-content {
+      background: white;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .history-header {
+      background: linear-gradient(135deg, #f59e0b, #eab308);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .close-history {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .history-item {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-left: 4px solid #f59e0b;
+      border: 1px solid #e2e8f0;
+    }
+
+    .history-item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .history-item-date {
+      font-weight: 600;
+    }
+
+    .history-item-delete {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      padding: 2px 6px;
+      font-size: 12px;
+    }
+
+    .history-item-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .history-item-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .history-item-label {
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .history-item-value {
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .history-item-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .history-actions {
+      padding: 16px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 10px;
+    }
+
+    .history-actions button {
+      flex: 1;
+    }
+
+    /* Purple gradient for history button */
+    .action-btn.history {
+      background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 60%, #c4b5fd 100%);
+    }
+
+    .action-btn.history:hover {
+      background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 60%, #a78bfa 100%);
+    }
+
+    /* Orange gradient for load button */
+    .action-btn.load {
+      background: linear-gradient(135deg, #f59e0b 0%, #eab308 60%, #fde68a 100%);
+    }
+
+    .action-btn.load:hover {
+      background: linear-gradient(135deg, #d97706 0%, #f59e0b 60%, #fcd34d 100%);
+    }
+
+    /* Enhanced Mobile Responsiveness */
+    @media (max-width: 480px) {
+      body {
+        font-size: 13px;
+      }
+      .container {
+        padding: 10px;
+      }
+      .normal-calculator {
+       padding: 10px;
+    }
+
+      
+      .header h1 {
+        font-size: 1.75rem;
+      }
+      
+      .mode-btn {
+        padding: 8px 16px;
+        min-width: 100px;
+        font-size: 12px;
+      }
+      
+      .input-grid {
+        gap: 8px;
+      }
+      
+      .input-card-inner {
+        padding: 12px;
+      }
+      
+      .input-field {
+        padding: 8px 10px;
+        font-size: 13px;
+        min-height: 38px;
+      }
+      
+      .calculator-display-container {
+        padding: 16px;
+        min-height: 120px;
+      }
+      
+      .calculator-current-input {
+        font-size: 1.5rem;
+      }
+      
+      .calculator-live-result {
+        font-size: 1rem;
+      }
+      
+      .calc-btn {
+        padding: 14px 6px;
+        font-size: 1.1rem;
+      }
+      
+      th {
+        padding: 10px 6px;
+        font-size: 11px;
+      }
+      
+      td {
+        padding: 6px;
+      }
+      
+      .table-input {
+        padding: 6px 4px;
+        font-size: 12px;
+        min-height: 34px;
+      }
+      
+      .action-buttons {
+        gap: 8px;
+      }
+      
+      .action-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        min-height: 36px;
+      }
+      
+      footer {
+        padding: 16px 12px;
+      }
+      
+      footer p {
+        font-size: 11px;
+      }
+
+      .history-content {
+        max-height: 70vh;
+      }
+
+      .history-item-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .mode-btn {
+        padding: 6px 12px;
+        min-width: 90px;
+        font-size: 11px;
+      }
+      
+      .input-field {
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+      
+      .calculator-display-container {
+        padding: 12px;
+        min-height: 100px;
+      }
+      
+      .calculator-current-input {
+        font-size: 1.3rem;
+      }
+      
+      .calculator-live-result {
+        font-size: 0.9rem;
+      }
+      
+      .calc-btn {
+        padding: 12px 4px;
+        font-size: 1rem;
+      }
+      
+      .table-input {
+        font-size: 11px;
+        padding: 5px 3px;
+      }
+      
+      .action-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+    <div class="header">
+      <h1 id="main-title">Gold Calculator</h1>
+      <!--<div class="gold-line"></div>-->
+    </div>
+
+<div class="container">
+    
+    <!-- Mode Toggle -->
+    <div class="mode-toggle-container">
+      <div class="mode-toggle">
+        <button class="mode-btn active" onclick="switchMode('gold')">
+          <i class="fas fa-crown"></i> Gold Calc
+        </button>
+        <button class="mode-btn" onclick="switchMode('normal')">
+          <i class="fas fa-calculator"></i> Normal Calc
+        </button>
+      </div>
+    </div>
+
+    <!-- Gold Calculator -->
+    <div id="gold-calculator" class="gold-calculator">
+      <!-- Toggle Buttons -->
+      <div class="toggle-container">
+        <button class="btn btn-primary" onclick="clearAll()">
+          <i class="fas fa-undo"></i> Clear All
+        </button>
+      </div>
+
+      <!-- Input Cards -->
+      <div class="input-grid">
+        <div class="input-card">
+          <div class="input-card-inner">
+            <div class="input-group">
+              <label>Target Purity:</label>
+              <input type="number" id="target-purity" class="input-field" 
+                     oninput="calculateWeightNeeded()" 
+                    inputmode="decimal"
+                     onkeydown="moveFocus(event, 'available-purity')"
+                     placeholder="Enter target purity" />
+            </div>
+          </div>
+        </div>
+
+        <div class="input-card">
+          <div class="input-card-inner">
+            <div class="input-group">
+              <label>Available Purity:</label>
+              <input type="number" id="available-purity" class="input-field" 
+                     oninput="calculateWeightNeeded()" 
+                    inputmode="decimal"
+                     onkeydown="moveFocus(event, 'weight-1')"
+                     placeholder="Enter available purity" />
+            </div>
+          </div>
+        </div>
+
+        <div class="input-card">
+          <div class="input-card-inner">
+            <div class="input-group">
+              <label>Weight Needed:</label>
+              <input type="number" inputmode="decimal" id="weight-needed" class="input-field result" readonly />
+            </div>
+          </div>
+        </div>
+
+        <div class="input-card">
+          <div class="input-card-inner">
+            <div class="input-group">
+              <label>Copper Needed:</label>
+              <input type="number" inputmode="decimal" id="copper-needed" class="input-field result" readonly />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-container">
+        <div class="table-inner">
+          <table id="data-table">
+            <thead>
+              <tr>
+                <th>Purity</th>
+                <th>Weight (g)</th>
+                <th>Net Weight (g)</th>
+              </tr>
+            </thead>
+            <tbody id="data-rows">
+              <!-- Rows will be added dynamically -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td><input type="number" inputmode="decimal" id="avg-purity" class="table-input result" readonly /></td>
+                <td><input type="number" inputmode="decimal" id="total-weight" class="table-input result" readonly /></td>
+                <td><input type="number" inputmode="decimal" id="total-net" class="table-input result" readonly /></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="action-btn add" onpointerdown="addRow()">
+          <i class="fas fa-plus"></i> Add Row
+        </button>
+        <button class="action-btn remove" onpointerdown="removeRow()">
+          <i class="fas fa-minus"></i> Remove Row
+        </button>
+        <button class="action-btn history" onclick="saveToHistory()">
+          <i class="fas fa-save"></i> Save to History
+        </button>
+        <button class="action-btn load" onclick="showHistory()">
+          <i class="fas fa-history"></i> View History
+        </button>
+        <button class="action-btn" onclick="takeScreenshotPage()">
+          <i class="fas fa-file-alt"></i> Save Page
+        </button>
+        <button class="action-btn" onclick="takeScreenshotTable()">
+          <i class="fas fa-table"></i> Save Table
+        </button>
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="history-modal">
+      <div class="history-content">
+        <div class="history-header">
+          <h2><i class="fas fa-history"></i> Calculation History</h2>
+          <button class="close-history" onclick="hideHistory()">&times;</button>
+        </div>
+        <div class="history-list" id="history-list">
+          <!-- History items will be loaded here -->
+        </div>
+        <div class="history-actions">
+          <button class="action-btn remove" onclick="clearHistory()">
+            <i class="fas fa-trash"></i> Clear All History
+          </button>
+          <button class="action-btn" onclick="hideHistory()">
+            <i class="fas fa-times"></i> Close
+          </button>
+        </div>
+      </div>
+    </div>
+</div>
+    <!-- Normal Calculator - UPDATED -->
+    <div id="normal-calculator" class="normal-calculator">
+      <div class="calculator-display-container">
+        <div class="calculator-current-input" id="current-input">0</div>
+        <div class="calculator-live-result" id="live-result"></div>
+      </div>
+      
+      <div class="calculator-buttons">
+        <button class="calc-btn clear" onpointerdown="clearCalculator()">AC</button>
+        <button class="calc-btn backspace" onpointerdown="backspace()">⌫</button>
+        <button class="calc-btn" onpointerdown="handlePercentage()">%</button>
+        <button class="calc-btn operator" onpointerdown="handleOperation('/')">÷</button>
+        
+        <button class="calc-btn" onpointerdown="appendToDisplay('7')">7</button>
+        <button class="calc-btn" onpointerdown="appendToDisplay('8')">8</button>
+        <button class="calc-btn" onpointerdown="appendToDisplay('9')">9</button>
+        <button class="calc-btn operator" onpointerdown="handleOperation('*')">×</button>
+        
+        <button class="calc-btn" onpointerdown="appendToDisplay('4')">4</button>
+        <button class="calc-btn" onpointerdown="appendToDisplay('5')">5</button>
+        <button class="calc-btn" onpointerdown="appendToDisplay('6')">6</button>
+        <button class="calc-btn operator" onpointerdown="handleOperation('-')">−</button>
+        
+        <button class="calc-btn" onpointerdown="appendToDisplay('1')">1</button>
+        <button class="calc-btn" onpointerdown="appendToDisplay('2')">2</button>
+        <button class="calc-btn" onpointerdown="appendToDisplay('3')">3</button>
+        <button class="calc-btn operator" onpointerdown="handleOperation('+')">+</button>
+        
+        <button class="calc-btn zero" onpointerdown="appendToDisplay('0')">0</button>
+        <button class="calc-btn" onpointerdown="appendToDisplay('.')">.</button>
+        <button class="calc-btn equals" onpointerdown="calculateResult()">=</button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2025 Bloudan Jewellery | Built by Waleed Sheeraz</p>
+    </footer>
+  
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    // Prevent double-tap zoom on mobile
+    document.addEventListener('touchstart', function(event) {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    // Prevent context menu on long press
+    document.addEventListener('contextmenu', function(event) {
+      event.preventDefault();
+    });
+
+    // Mode switching functionality
+    let currentMode = 'gold';
+
+    function switchMode(mode) {
+      currentMode = mode;
+      
+      // Update active button
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // Update title
+      document.getElementById('main-title').textContent = 
+        mode === 'gold' ? 'Gold Calculator' : 'Normal Calculator';
+      
+      // Show/hide calculators
+      document.getElementById('gold-calculator').style.display = 
+        mode === 'gold' ? 'block' : 'none';
+      document.getElementById('normal-calculator').style.display = 
+        mode === 'gold' ? 'none' : 'block';
+    }
+
+    // History Management Functions
+    const HISTORY_KEY = 'goldCalculatorHistory';
+    const MAX_HISTORY_ITEMS = 50;
+
+    function saveToHistory() {
+      // Get current calculation data
+      const targetPurity = document.getElementById('target-purity').value;
+      const availablePurity = document.getElementById('available-purity').value;
+      const weightNeeded = document.getElementById('weight-needed').value;
+      const copperNeeded = document.getElementById('copper-needed').value;
+      const totalWeight = document.getElementById('total-weight').value;
+      const totalNet = document.getElementById('total-net').value;
+      const avgPurity = document.getElementById('avg-purity').value;
+
+      // Get table data
+      const tableData = [];
+      const rows = document.querySelectorAll('#data-rows tr');
+      rows.forEach(row => {
+        const purity = row.querySelector('.purity').value;
+        const weight = row.querySelector('.weight').value;
+        const net = row.querySelector('.net').value;
+        if (purity || weight) {
+          tableData.push({ purity, weight, net });
+        }
+      });
+
+      // Create history item
+      const historyItem = {
+        id: Date.now(),
+        date: new Date().toLocaleString(),
+        targetPurity,
+        availablePurity,
+        weightNeeded,
+        copperNeeded,
+        totalWeight,
+        totalNet,
+        avgPurity,
+        tableData,
+        timestamp: new Date().toISOString()
+      };
+
+      // Get existing history
+      let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+
+      // Add new item to beginning
+      history.unshift(historyItem);
+
+      // Limit history size
+      if (history.length > MAX_HISTORY_ITEMS) {
+        history = history.slice(0, MAX_HISTORY_ITEMS);
+      }
+
+      // Save back to localStorage
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+      // Show success message
+      alert('Calculation saved to history!');
+    }
+
+    function showHistory() {
+      const modal = document.getElementById('history-modal');
+      const historyList = document.getElementById('history-list');
+      
+      // Load history from localStorage
+      const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+      
+      if (history.length === 0) {
+        historyList.innerHTML = `
+          <div class="history-item-empty">
+            <i class="fas fa-history" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;"></i>
+            <p>No calculation history yet</p>
+            <p style="font-size: 12px; margin-top: 8px;">Save calculations to see them here</p>
+          </div>
+        `;
+      } else {
+        historyList.innerHTML = history.map(item => `
+          <div class="history-item" data-id="${item.id}">
+            <div class="history-item-header">
+              <span class="history-item-date">${item.date}</span>
+              <button class="history-item-delete" onclick="deleteHistoryItem(${item.id})">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            <div class="history-item-content">
+              <div class="history-item-row">
+                <span class="history-item-label">Target Purity:</span>
+                <span class="history-item-value">${item.targetPurity || '0'}</span>
+              </div>
+              <div class="history-item-row">
+                <span class="history-item-label">Available Purity:</span>
+                <span class="history-item-value">${item.availablePurity || '0'}</span>
+              </div>
+              <div class="history-item-row">
+                <span class="history-item-label">Weight Needed:</span>
+                <span class="history-item-value">${item.weightNeeded || '0'}g</span>
+              </div>
+              <div class="history-item-row">
+                <span class="history-item-label">Copper Needed:</span>
+                <span class="history-item-value">${item.copperNeeded || '0'}g</span>
+              </div>
+              <div class="history-item-row">
+                <span class="history-item-label">Total Weight:</span>
+                <span class="history-item-value">${item.totalWeight || '0'}g</span>
+              </div>
+              <div class="history-item-row">
+                <span class="history-item-label">Avg Purity:</span>
+                <span class="history-item-value">${item.avgPurity || '0'}</span>
+              </div>
+            </div>
+            <div style="margin-top: 8px; text-align: center;">
+              <button class="action-btn load" onclick="loadHistoryItem(${item.id})" style="padding: 4px 12px; font-size: 11px;">
+                <i class="fas fa-upload"></i> Load This Calculation
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      modal.classList.add('active');
+    }
+
+    function hideHistory() {
+      document.getElementById('history-modal').classList.remove('active');
+    }
+
+    function deleteHistoryItem(id) {
+      let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+      history = history.filter(item => item.id !== id);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      showHistory(); // Refresh the list
+    }
+
+    function clearHistory() {
+      if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+        localStorage.removeItem(HISTORY_KEY);
+        showHistory();
+      }
+    }
+
+    function loadHistoryItem(id) {
+      const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+      const item = history.find(item => item.id === id);
+      
+      if (!item) {
+        alert('Calculation not found in history.');
+        return;
+      }
+
+      // Load the data into the calculator
+      document.getElementById('target-purity').value = item.targetPurity || '';
+      document.getElementById('available-purity').value = item.availablePurity || '';
+      document.getElementById('weight-needed').value = item.weightNeeded || '';
+      document.getElementById('copper-needed').value = item.copperNeeded || '';
+      document.getElementById('total-weight').value = item.totalWeight || '';
+      document.getElementById('total-net').value = item.totalNet || '';
+      document.getElementById('avg-purity').value = item.avgPurity || '';
+
+      // Clear existing rows
+      const tableBody = document.getElementById("data-rows");
+      tableBody.innerHTML = '';
+
+      // Add rows from history
+      if (item.tableData && item.tableData.length > 0) {
+        item.tableData.forEach((rowData, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>
+              <input type="number" inputmode="decimal" class="table-input purity" id="purity-${index + 1}" 
+                     step="0.1" oninput="calculateNetWeight()" 
+                     value="${rowData.purity || ''}"
+                     placeholder="0.0" />
+            </td>
+            <td>
+              <input type="number" inputmode="decimal" class="table-input weight" id="weight-${index + 1}" 
+                     step="0.01" oninput="calculateNetWeight()" 
+                     value="${rowData.weight || ''}"
+                     placeholder="0.00" />
+            </td>
+            <td>
+              <input type="number" inputmode="decimal" class="table-input result net" 
+                     value="${rowData.net || ''}" readonly />
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } else {
+        // Add default rows if no table data
+        for (let i = 0; i < 3; i++) addRow();
+      }
+
+      // Recalculate
+      calculateNetWeight();
+      calculateWeightNeeded();
+      
+      // Close history modal
+      hideHistory();
+      
+      // Show success message
+      alert('Calculation loaded successfully!');
+    }
+
+    // Gold Calculator Functions
+    // Initialize with some rows
+    for (let i = 0; i < 3; i++) addRow();
+
+    function addRow() {
+      const tableBody = document.getElementById("data-rows");
+      const rowCount = tableBody.rows.length;
+      const row = document.createElement("tr");
+
+      row.classList.add('slide-right');
+      row.innerHTML = `
+       <td>
+          <input type="number" inputmode="decimal" class="table-input purity" id="purity-${rowCount + 1}" 
+                 step="0.1" oninput="calculateNetWeight()" 
+                 onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"
+                 placeholder="0.0" />
+        </td>
+        <td>
+          <input type="number" inputmode="decimal" class="table-input weight" id="weight-${rowCount + 1}" 
+                 step="0.01" oninput="calculateNetWeight()" 
+                 onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"
+                 placeholder="0.00" />
+        </td>
+        <td>
+          <input type="number" inputmode="decimal" class="table-input result net" readonly />
+        </td>
+      `;
+      tableBody.appendChild(row);
+    }
+
+    function removeRow() {
+      const tableBody = document.getElementById("data-rows");
+      if (tableBody.rows.length > 0) {
+        const row = tableBody.rows[tableBody.rows.length - 1];
+        row.classList.add('slide-left');
+        row.addEventListener('animationend', () => {
+          row.remove();
+          calculateNetWeight();
+          calculateWeightNeeded();
+        });
+      }
+    }
+
+    function calculateNetWeight() {
+      const weights = document.querySelectorAll('.weight');
+      const purities = document.querySelectorAll('.purity');
+      const nets = document.querySelectorAll('.net');
+
+      let totalWeight = 0;
+      let totalNet = 0;
+
+      for (let i = 0; i < weights.length; i++) {
+        const weight = parseFloat(weights[i].value) || 0;
+        const purity = parseFloat(purities[i].value) || 0;
+        const net = weight * purity / 999;
+        nets[i].value = net.toFixed(2);
+        totalWeight += weight;
+        totalNet += net;
+      }
+
+      document.getElementById('total-weight').value = totalWeight.toFixed(2);
+      document.getElementById('total-net').value = totalNet.toFixed(2);
+      if (totalWeight > 0) {
+        const avgPurity = (totalNet / totalWeight) * 999;
+        document.getElementById('avg-purity').value = avgPurity.toFixed(1);
+      } else {
+        document.getElementById('avg-purity').value = '';
+      }
+
+      calculateWeightNeeded();
+    }
+
+    function calculateWeightNeeded() {
+      const W1 = parseFloat(document.getElementById('total-weight').value);
+      const P1 = parseFloat(document.getElementById('avg-purity').value);
+      const Pt = parseFloat(document.getElementById('target-purity').value);
+      const P2 = parseFloat(document.getElementById('available-purity').value);
+
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && !isNaN(P2) && P2 !== Pt) {
+        const W2 = (W1 * (Pt - P1)) / (P2 - Pt);
+        document.getElementById('weight-needed').value = W2 > 0 ? W2.toFixed(2) : '0.00';
+      } else {
+        document.getElementById('weight-needed').value = '';
+      }
+
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && Pt !== 0) {
+        const copperW = (W1 * (P1 - Pt)) / Pt;
+        document.getElementById('copper-needed').value = copperW > 0 ? copperW.toFixed(2) : '0.00';
+      } else {
+        document.getElementById('copper-needed').value = '';
+      }
+    }
+
+    function clearAll() {
+      if (confirm('Are you sure you want to clear all data?')) {
+        document.getElementById('target-purity').value = '';
+        document.getElementById('available-purity').value = '';
+        document.getElementById('weight-needed').value = '';
+        document.getElementById('copper-needed').value = '';
+        document.getElementById('total-weight').value = '';
+        document.getElementById('total-net').value = '';
+        document.getElementById('avg-purity').value = '';
+        document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
+        document.querySelectorAll('.net').forEach(net => net.value = '');
+
+        const table = document.getElementById('data-table');
+        table.classList.add('fade');
+        setTimeout(() => table.classList.remove('fade'), 500);
+      }
+    }
+
+    // Normal Calculator Functions - FIXED CONTINUATION BEHAVIOR
+    let currentInput = '0';
+    let isNewCalculation = true;
+    let lastResult = null;
+
+    function updateDisplay() {
+      const currentInputElement = document.getElementById('current-input');
+      const liveResultElement = document.getElementById('live-result');
+      
+      // Update current input line
+      currentInputElement.textContent = currentInput;
+      
+      // Calculate and show live result
+      if (!isNewCalculation) {
+        try {
+          const result = evaluateExpression(currentInput);
+          if (!isNaN(result) && isFinite(result)) {
+            liveResultElement.textContent = '= ' + formatNumber(result);
+            lastResult = result;
+          } else {
+            liveResultElement.textContent = '';
+          }
+        } catch (e) {
+          liveResultElement.textContent = '';
+        }
+      } else {
+        liveResultElement.textContent = '';
+      }
+    }
+
+    function appendToDisplay(value) {
+      if (isNewCalculation) {
+        // If we have a previous result and user types a number, start fresh
+        if (lastResult !== null && /[0-9]/.test(value)) {
+          currentInput = value;
+        } else {
+          // If user types after result, continue from result
+          currentInput = lastResult !== null ? lastResult.toString() + value : value;
+        }
+        isNewCalculation = false;
+      } else {
+        // Prevent multiple decimal points in a number
+        if (value === '.' && currentInput.split(/[\+\-\*\/]/).pop().includes('.')) {
+          return;
+        }
+        currentInput += value;
+      }
+      updateDisplay();
+    }
+
+    function backspace() {
+      if (isNewCalculation) {
+        clearCalculator();
+        return;
+      }
+      
+      if (currentInput.length > 1) {
+        currentInput = currentInput.slice(0, -1);
+      } else {
+        currentInput = '0';
+        isNewCalculation = true;
+      }
+      updateDisplay();
+    }
+
+    function clearCalculator() {
+      currentInput = '0';
+      isNewCalculation = true;
+      lastResult = null;
+      updateDisplay();
+    }
+
+    function handleOperation(op) {
+      if (isNewCalculation && lastResult !== null) {
+        // Continue from previous result with new operator
+        currentInput = lastResult.toString() + op;
+        isNewCalculation = false;
+      } else if (isNewCalculation) {
+        currentInput = '0' + op;
+        isNewCalculation = false;
+      } else {
+        // Check if last character is an operator, replace it
+        const lastChar = currentInput.slice(-1);
+        if (['+', '-', '*', '/'].includes(lastChar)) {
+          currentInput = currentInput.slice(0, -1) + op;
+        } else {
+          currentInput += op;
+        }
+      }
+      updateDisplay();
+    }
+
+    function calculateResult() {
+      if (isNewCalculation) return;
+
+      try {
+        const result = evaluateExpression(currentInput);
+        const formattedResult = formatNumber(result);
+        
+        // Store result and set as current input
+        lastResult = result;
+        currentInput = formattedResult;
+        isNewCalculation = true;
+        
+        updateDisplay();
+      } catch (e) {
+        currentInput = 'Error';
+        isNewCalculation = true;
+        lastResult = null;
+        updateDisplay();
+      }
+    }
+
+    function handlePercentage() {
+      if (isNewCalculation) return;
+      
+      try {
+        // Calculate percentage of the current expression
+        const result = evaluateExpression(currentInput);
+        const percentageResult = result / 100;
+        currentInput = formatNumber(percentageResult);
+        lastResult = percentageResult;
+        isNewCalculation = true;
+        updateDisplay();
+      } catch (e) {
+        currentInput = 'Error';
+        isNewCalculation = true;
+        lastResult = null;
+        updateDisplay();
+      }
+    }
+
+    function evaluateExpression(expr) {
+      // Replace display operators with JavaScript operators
+      expr = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+      
+      // Remove any trailing operators
+      expr = expr.replace(/[\+\-\*\/]$/, '');
+      
+      try {
+        const result = Function('"use strict"; return (' + expr + ')')();
+        if (typeof result !== 'number' || !isFinite(result)) {
+          throw new Error('Invalid result');
+        }
+        return result;
+      } catch (error) {
+        throw new Error('Evaluation error');
+      }
+    }
+
+    function formatNumber(num) {
+      // Handle very small numbers
+      if (Math.abs(num) < 0.000001 && num !== 0) {
+        return num.toExponential(6);
+      }
+      
+      // Format regular numbers
+      if (num % 1 === 0) {
+        return num.toString();
+      } else {
+        // Remove trailing zeros
+        return parseFloat(num.toFixed(10)).toString();
+      }
+    }
+
+    // Initialize calculator display
+    updateDisplay();
+
+    // Common Functions
+async function takeScreenshotPage() {
+  document.body.classList.add('no-animations');
+  
+  // Add temporary spacing if content is too short
+  const originalContainerStyle = document.querySelector('.container').style.minHeight;
+  const isContentShort = document.body.scrollHeight < window.innerHeight * 0.8;
+  
+  if (isContentShort) {
+    document.querySelector('.container').style.minHeight = '70vh';
+    // Force reflow
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+  
+  try {
+    const canvas = await html2canvas(document.body, { 
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight
+    });
+    
+    canvas.toBlob(blob => {
+      const file = new File([blob], "calculator_screenshot.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: "Calculator Screenshot" });
+      } else {
+        const link = document.createElement('a');
+        link.download = 'calculator_screenshot.png';
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 100);
+      }
+    }, 'image/png');
+  } catch (error) {
+    console.error('Screenshot failed:', error);
+    alert('Failed to capture screenshot. Please try again.');
+  } finally {
+    // Restore original styles
+    document.querySelector('.container').style.minHeight = originalContainerStyle;
+    document.body.classList.remove('no-animations');
+  }
+}
+
+    async function takeScreenshotTable() {
+      if (currentMode !== 'gold') return;
+      
+      const table = document.getElementById('data-table');
+      document.body.classList.add('no-animations');
+
+      const canvas = await html2canvas(table, {
+        backgroundColor: '#ffffff',
+        scale: 2
+      });
+
+      canvas.toBlob(blob => {
+        const file = new File([blob], "gold_calculator_table_screenshot.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "Gold Calculator Table" });
+        } else {
+          const link = document.createElement('a');
+          link.download = 'gold_calculator_table_screenshot.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
+        }
+      }, 'image/png');
+
+      document.body.classList.remove('no-animations');
+    }
+
+    function moveFocus(e, nextId) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const nextElement = document.getElementById(nextId);
+        if (nextElement) nextElement.focus();
+      }
+    }
+
+    // Close history modal when clicking outside
+    document.getElementById('history-modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        hideHistory();
+      }
+    });
+  </script>
+  <script>
+function setViewportHeight() {
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
+}
+setViewportHeight();
+window.addEventListener('resize', setViewportHeight);
+</script>
+
+  <script>
+(async () => {
+  // Save current page as lastPage for future visits
+  const lastPage = localStorage.getItem("lastPage") || "";
+  localStorage.setItem("lastPage", location.href);
+
+  const data = {
+    page: location.href,
+    site: "Gold Calculator",
+    screenWidth: screen.width,
+    screenHeight: screen.height,
+    pixelRatio: devicePixelRatio,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    language: navigator.language,
+    // Use document.referrer or lastPage in localStorage
+    referrer: document.referrer || lastPage || "",
+
+    browser: navigator.userAgent,
+    os: navigator.platform,
+    device: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+  };
+
+  try {
+    await fetch("https://website-tracker-x2s1.onrender.com/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+  } catch (err) {
+    console.error("Tracking failed:", err);
+  }
+})();
+</script>
+  
+</body>
+</html>
