@@ -723,6 +723,159 @@ body::before {
       background: linear-gradient(135deg, #d97706 0%, #f59e0b 60%, #fcd34d 100%);
     }
 
+    /* TOP NOTIFICATION MODAL STYLES */
+    .top-notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      z-index: 2000;
+      min-width: 300px;
+      max-width: 90%;
+      background: white;
+      border-radius: 12px;
+      padding: 0;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      opacity: 0;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+    }
+
+    .top-notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .notification-header {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .notification-content {
+      padding: 24px;
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #374151;
+    }
+
+    .notification-actions {
+      padding: 16px 24px 24px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .notification-btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+
+    .notification-btn.confirm {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25);
+    }
+
+    .notification-btn.confirm:hover {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .notification-btn.cancel {
+      background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(239, 68, 68, 0.25);
+    }
+
+    .notification-btn.cancel:hover {
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .notification-btn.neutral {
+      background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+      color: white;
+      box-shadow: 0 4px 6px rgba(107, 114, 128, 0.25);
+    }
+
+    .notification-btn.neutral:hover {
+      background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(107, 114, 128, 0.3);
+    }
+
+    /* Success notification styles */
+    .top-notification.success .notification-header {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    }
+
+    .top-notification.success .notification-header i {
+      animation: bounce 0.8s ease infinite;
+    }
+
+    /* Warning notification styles */
+    .top-notification.warning .notification-header {
+      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+    }
+
+    .top-notification.warning .notification-header i {
+      animation: pulse 1.5s ease infinite;
+    }
+
+    /* Danger notification styles */
+    .top-notification.danger .notification-header {
+      background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    }
+
+    .top-notification.danger .notification-header i {
+      animation: shake 0.5s ease infinite;
+    }
+
+    /* Info notification styles */
+    .top-notification.info .notification-header {
+      background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    }
+
+    .top-notification.info .notification-header i {
+      animation: float 2s ease-in-out infinite;
+    }
+
+    /* Animations */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotate(0); }
+      25% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
     /* Enhanced Mobile Responsiveness */
     @media (max-width: 480px) {
       body {
@@ -818,6 +971,31 @@ body::before {
       .history-item-content {
         grid-template-columns: 1fr;
       }
+
+      .top-notification {
+        min-width: 280px;
+        max-width: 95%;
+      }
+
+      .notification-header {
+        padding: 14px 20px;
+        font-size: 14px;
+      }
+
+      .notification-content {
+        padding: 20px;
+        font-size: 13px;
+      }
+
+      .notification-actions {
+        padding: 14px 20px 20px;
+        flex-direction: column;
+      }
+
+      .notification-btn {
+        width: 100%;
+        padding: 12px;
+      }
     }
 
     @media (max-width: 360px) {
@@ -863,6 +1041,20 @@ body::before {
         padding: 6px 10px;
         font-size: 11px;
       }
+
+      .top-notification {
+        min-width: 260px;
+      }
+
+      .notification-header {
+        padding: 12px 16px;
+        font-size: 13px;
+      }
+
+      .notification-content {
+        padding: 16px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -891,7 +1083,7 @@ body::before {
     <div id="gold-calculator" class="gold-calculator">
       <!-- Toggle Buttons -->
       <div class="toggle-container">
-        <button class="btn btn-primary" onclick="clearAll()">
+        <button class="btn btn-primary" onclick="showClearDataConfirmation()">
           <i class="fas fa-undo"></i> Clear All
         </button>
       </div>
@@ -1002,7 +1194,7 @@ body::before {
           <!-- History items will be loaded here -->
         </div>
         <div class="history-actions">
-          <button class="action-btn remove" onclick="clearHistory()">
+          <button class="action-btn remove" onclick="showClearHistoryConfirmation()">
             <i class="fas fa-trash"></i> Clear All History
           </button>
           <button class="action-btn" onclick="hideHistory()">
@@ -1050,7 +1242,9 @@ body::before {
     <footer>
       <p>© 2025 Bloudan Jewellery | Built by Waleed Sheeraz</p>
     </footer>
-  
+
+  <!-- Top Notification Modal Container -->
+  <div id="notification-container"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
@@ -1096,6 +1290,124 @@ body::before {
         mode === 'gold' ? 'block' : 'none';
       document.getElementById('normal-calculator').style.display = 
         mode === 'gold' ? 'none' : 'block';
+    }
+
+    // Top Notification System
+    function showNotification(type, title, message, options = {}) {
+      const container = document.getElementById('notification-container');
+      const id = 'notification-' + Date.now();
+      
+      let buttonsHtml = '';
+      if (options.buttons) {
+        buttonsHtml = `
+          <div class="notification-actions">
+            ${options.buttons.map(btn => `
+              <button class="notification-btn ${btn.type}" onclick="${btn.onclick}">
+                <i class="${btn.icon}"></i> ${btn.text}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      }
+      
+      const notificationHtml = `
+        <div id="${id}" class="top-notification ${type}">
+          <div class="notification-header">
+            <i class="${getNotificationIcon(type)}"></i>
+            <span>${title}</span>
+          </div>
+          <div class="notification-content">
+            ${message}
+          </div>
+          ${buttonsHtml}
+        </div>
+      `;
+      
+      container.innerHTML += notificationHtml;
+      
+      setTimeout(() => {
+        const notification = document.getElementById(id);
+        notification.classList.add('show');
+      }, 10);
+      
+      // Auto-remove after timeout if no buttons
+      if (!options.buttons && !options.persistent) {
+        setTimeout(() => {
+          hideNotification(id);
+        }, options.duration || 3000);
+      }
+      
+      return id;
+    }
+    
+    function getNotificationIcon(type) {
+      switch(type) {
+        case 'success': return 'fas fa-check-circle';
+        case 'warning': return 'fas fa-exclamation-triangle';
+        case 'danger': return 'fas fa-times-circle';
+        case 'info': return 'fas fa-info-circle';
+        default: return 'fas fa-bell';
+      }
+    }
+    
+    function hideNotification(id) {
+      const notification = document.getElementById(id);
+      if (notification) {
+        notification.classList.remove('show');
+        setTimeout(() => {
+          notification.remove();
+        }, 500);
+      }
+    }
+    
+    function showSuccessSave() {
+      showNotification('success', 'Success!', 'Calculation saved to history!', {
+        duration: 2500
+      });
+    }
+    
+    function showSuccessLoad() {
+      showNotification('success', 'Loaded!', 'Calculation loaded successfully!', {
+        duration: 2500
+      });
+    }
+    
+    function showClearDataConfirmation() {
+      const id = showNotification('warning', 'Clear All Data', 'Are you sure you want to clear all calculation data? This action cannot be undone.', {
+        buttons: [
+          {
+            text: 'Yes, Clear All',
+            type: 'confirm',
+            icon: 'fas fa-check',
+            onclick: `clearAllData(); hideNotification('${id}')`
+          },
+          {
+            text: 'Cancel',
+            type: 'cancel',
+            icon: 'fas fa-times',
+            onclick: `hideNotification('${id}')`
+          }
+        ]
+      });
+    }
+    
+    function showClearHistoryConfirmation() {
+      const id = showNotification('danger', 'Clear All History', 'Are you sure you want to clear ALL calculation history? This action cannot be undone.', {
+        buttons: [
+          {
+            text: 'Yes, Delete All',
+            type: 'cancel',
+            icon: 'fas fa-trash',
+            onclick: `clearHistory(); hideNotification('${id}')`
+          },
+          {
+            text: 'Cancel',
+            type: 'neutral',
+            icon: 'fas fa-times',
+            onclick: `hideNotification('${id}')`
+          }
+        ]
+      });
     }
 
     // History Management Functions
@@ -1153,8 +1465,8 @@ body::before {
       // Save back to localStorage
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 
-      // Show success message
-      alert('Calculation saved to history!');
+      // Show success notification
+      showSuccessSave();
     }
 
     function showHistory() {
@@ -1231,10 +1543,11 @@ body::before {
     }
 
     function clearHistory() {
-      if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
-        localStorage.removeItem(HISTORY_KEY);
-        showHistory();
-      }
+      localStorage.removeItem(HISTORY_KEY);
+      showHistory();
+      showNotification('success', 'History Cleared', 'All calculation history has been cleared.', {
+        duration: 3000
+      });
     }
 
     function loadHistoryItem(id) {
@@ -1242,7 +1555,9 @@ body::before {
       const item = history.find(item => item.id === id);
       
       if (!item) {
-        alert('Calculation not found in history.');
+        showNotification('danger', 'Error', 'Calculation not found in history.', {
+          duration: 3000
+        });
         return;
       }
 
@@ -1295,8 +1610,8 @@ body::before {
       // Close history modal
       hideHistory();
       
-      // Show success message
-      alert('Calculation loaded successfully!');
+      // Show success notification
+      showSuccessLoad();
     }
 
     // Gold Calculator Functions
@@ -1392,22 +1707,24 @@ body::before {
       }
     }
 
-    function clearAll() {
-      if (confirm('Are you sure you want to clear all data?')) {
-        document.getElementById('target-purity').value = '';
-        document.getElementById('available-purity').value = '';
-        document.getElementById('weight-needed').value = '';
-        document.getElementById('copper-needed').value = '';
-        document.getElementById('total-weight').value = '';
-        document.getElementById('total-net').value = '';
-        document.getElementById('avg-purity').value = '';
-        document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
-        document.querySelectorAll('.net').forEach(net => net.value = '');
+    function clearAllData() {
+      document.getElementById('target-purity').value = '';
+      document.getElementById('available-purity').value = '';
+      document.getElementById('weight-needed').value = '';
+      document.getElementById('copper-needed').value = '';
+      document.getElementById('total-weight').value = '';
+      document.getElementById('total-net').value = '';
+      document.getElementById('avg-purity').value = '';
+      document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
+      document.querySelectorAll('.net').forEach(net => net.value = '');
 
-        const table = document.getElementById('data-table');
-        table.classList.add('fade');
-        setTimeout(() => table.classList.remove('fade'), 500);
-      }
+      const table = document.getElementById('data-table');
+      table.classList.add('fade');
+      setTimeout(() => table.classList.remove('fade'), 500);
+      
+      showNotification('success', 'Cleared!', 'All calculation data has been cleared.', {
+        duration: 2500
+      });
     }
 
     // Normal Calculator Functions - FIXED CONTINUATION BEHAVIOR
