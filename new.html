@@ -1352,9 +1352,14 @@ body::before {
       isRestoringDraft = true;
       
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
+      
+      // Always start with 3 rows if there are no rows
+      const tableBody = document.getElementById("data-rows");
+      if (tableBody.rows.length === 0) {
+        for (let i = 0; i < 3; i++) addRow();
+      }
+
       if (!draft) {
-        // Initialize with 3 empty rows if no draft
-        resetTableToThreeRows();
         isRestoringDraft = false;
         return;
       }
@@ -1369,7 +1374,6 @@ body::before {
       document.getElementById('avg-purity').value = draft.avgPurity || '';
 
       // Clear existing rows
-      const tableBody = document.getElementById("data-rows");
       tableBody.innerHTML = '';
 
       // Add rows from draft
@@ -1397,8 +1401,8 @@ body::before {
           tableBody.appendChild(row);
         });
       } else {
-        // Add 3 rows if no table data
-        resetTableToThreeRows();
+        // Add 3 empty rows
+        for (let i = 0; i < 3; i++) addRow();
       }
 
       // Recalculate
@@ -1419,48 +1423,12 @@ body::before {
       saveDraft();
     }
 
-    // Reset table to 3 empty rows
-    function resetTableToThreeRows() {
-      const tableBody = document.getElementById("data-rows");
-      tableBody.innerHTML = '';
-      
-      for (let i = 0; i < 3; i++) {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>
-            <input type="number" inputmode="decimal" class="table-input purity" id="purity-${i + 1}" 
-                   step="0.1" oninput="handleInputChange()" 
-                   onkeydown="moveFocus(event, 'weight-${i + 2}')"
-                   placeholder="0.0" />
-          </td>
-          <td>
-            <input type="number" inputmode="decimal" class="table-input weight" id="weight-${i + 1}" 
-                   step="0.01" oninput="handleInputChange()" 
-                   onkeydown="moveFocus(event, 'purity-${i + 1}')"
-                   placeholder="0.00" />
-          </td>
-          <td>
-            <input type="number" inputmode="decimal" class="table-input result net" readonly />
-          </td>
-        `;
-        tableBody.appendChild(row);
-      }
-      
-      // Recalculate
-      calculateNetWeight();
-      calculateWeightNeeded();
-    }
-
     // ===============================
     // TOP NOTIFICATION SYSTEM
     // ===============================
-    // Store active notification IDs
-    let activeNotificationId = null;
-
     function showNotification(type, title, message, options = {}) {
       const container = document.getElementById('notification-container');
       const id = 'notification-' + Date.now();
-      activeNotificationId = id;
       
       let buttonsHtml = '';
       if (options.buttons) {
@@ -1490,10 +1458,7 @@ body::before {
       
       // Remove any existing notification
       if (container.children.length > 0) {
-        Array.from(container.children).forEach(child => {
-          child.classList.remove('show');
-          setTimeout(() => child.remove(), 300);
-        });
+        Array.from(container.children).forEach(child => child.remove());
       }
       
       container.innerHTML += notificationHtml;
@@ -1532,7 +1497,6 @@ body::before {
         notification.classList.remove('show');
         setTimeout(() => {
           notification.remove();
-          activeNotificationId = null;
         }, 300);
       }
     }
@@ -1549,10 +1513,9 @@ body::before {
       });
     }
     
-    // FIXED: Show Clear Data Confirmation
+    // Show Clear Data Confirmation
     function showClearDataConfirmation() {
-      const id = 'clear-data-' + Date.now();
-      showNotification('warning', 'Clear All Data', 'Are you sure you want to clear all calculation data? This will reset the table to 3 empty rows.', {
+      const id = showNotification('warning', 'Clear All Data', 'Are you sure you want to clear all calculation data? This will clear all input values but keep the table rows.', {
         buttons: [
           {
             text: 'Yes, Clear All',
@@ -1571,10 +1534,9 @@ body::before {
       });
     }
     
-    // FIXED: Show Clear History Confirmation
+    // Show Clear History Confirmation
     function showClearHistoryConfirmation() {
-      const id = 'clear-history-' + Date.now();
-      showNotification('danger', 'Clear All History', 'Are you sure you want to clear ALL calculation history? This action cannot be undone.', {
+      const id = showNotification('danger', 'Clear All History', 'Are you sure you want to clear ALL calculation history? This action cannot be undone.', {
         buttons: [
           {
             text: 'Yes, Delete All',
@@ -1593,7 +1555,7 @@ body::before {
       });
     }
     
-    // FIXED: Perform clear all data
+    // Perform clear all data
     function performClearAllData(notificationId) {
       // Clear all input fields
       document.getElementById('target-purity').value = '';
@@ -1604,35 +1566,37 @@ body::before {
       document.getElementById('total-net').value = '';
       document.getElementById('avg-purity').value = '';
       
-      // Reset table to 3 empty rows
-      resetTableToThreeRows();
+      // Clear all table inputs but keep rows
+      document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
+      document.querySelectorAll('.net').forEach(net => net.value = '');
       
       // Clear draft
       clearDraft();
       
-      // Add fade animation to table
-      const table = document.getElementById('data-table');
-      table.classList.add('fade');
-      setTimeout(() => table.classList.remove('fade'), 500);
+      // Recalculate
+      calculateNetWeight();
+      calculateWeightNeeded();
       
       // Hide the confirmation notification
       hideNotification(notificationId);
       
       // Show success notification
       setTimeout(() => {
-        showNotification('success', 'Cleared!', 'All calculation data has been cleared. Table reset to 3 rows.', {
+        showNotification('success', 'Cleared!', 'All calculation data has been cleared.', {
           duration: 2500
         });
       }, 350);
     }
     
-    // FIXED: Perform clear history
+    // Perform clear history
     function performClearHistory(notificationId) {
       // Clear history from localStorage
       localStorage.removeItem(HISTORY_KEY);
       
-      // Refresh history list
-      showHistory();
+      // Refresh history list if modal is open
+      if (document.getElementById('history-modal').classList.contains('active')) {
+        showHistory();
+      }
       
       // Hide the confirmation notification
       hideNotification(notificationId);
@@ -1828,8 +1792,8 @@ body::before {
           tableBody.appendChild(row);
         });
       } else {
-        // Add 3 rows if no table data
-        resetTableToThreeRows();
+        // Add 3 empty rows
+        for (let i = 0; i < 3; i++) addRow();
       }
 
       // Recalculate
@@ -2210,6 +2174,14 @@ body::before {
     // Restore draft on page load
     window.addEventListener('DOMContentLoaded', function() {
       restoreDraft();
+    });
+
+    // Initialize with 3 rows if empty
+    document.addEventListener('DOMContentLoaded', function() {
+      const tableBody = document.getElementById("data-rows");
+      if (tableBody.rows.length === 0) {
+        for (let i = 0; i < 3; i++) addRow();
+      }
     });
 
   </script>
