@@ -23,6 +23,7 @@ if ("serviceWorker" in navigator) {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
+    /* All CSS styles remain exactly the same as before */
     * {
       margin: 0;
       padding: 0;
@@ -58,11 +59,10 @@ body {
   );
   max-width: 800px;
   margin: 0 auto;
-  height: 100vh; /* fallback */
-  height: var(--vh, 100vh); /* use real viewport height if set */
+  height: 100vh;
+  height: var(--vh, 100vh);
 }
 
-/* Ensure proper rendering for screenshot */
 body::before {
   content: '';
   position: fixed;
@@ -75,7 +75,6 @@ body::before {
   pointer-events: none;
 }
 
-/* Improve header/footer rendering for screenshots */
 .header, footer {
   position: relative;
   z-index: 10;
@@ -85,44 +84,33 @@ body::before {
       max-width: 700px;
       margin: 0 auto;
       padding: 12px;
-        background: transparent;
-  position: relative;
-  z-index: 1;
-      
+      background: transparent;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Header Section */
     .header {
-    user-select: none;                  /* select-none */
-  position: sticky;                   /* sticky */
-  top: 0;                             /* top-0 */
-  background: linear-gradient(to right, #1d4ed8, #c7a332); /* bg-gradient-to-r from-[#1d4ed8] to-[#c7a332] */
-  color: white;                       /* text-white */
-  display: flex;                      /* flex */
-  justify-content: center;            /* justify-center */
-  align-items: center;                /* items-center */
-  padding: 0.5rem 1.25rem;              /* py-4 px-5 */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* shadow-md approximation */
-  z-index: 60; 
-  margin-bottom: 15px;
+    user-select: none;
+    position: sticky;
+    top: 0;
+    background: linear-gradient(to right, #1d4ed8, #c7a332);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 60; 
+    margin-bottom: 15px;
     }
 
     .header h1 {
-        font-family: serif;                 /* font-serif */
-  font-size: 3.25rem;                 /* text-4xl */
-  letter-spacing: 0.05em;             /* tracking-wide approximation */
-  margin: 0;
+        font-family: serif;
+        font-size: 3.25rem;
+        letter-spacing: 0.05em;
+        margin: 0;
     }
 
-    .gold-line {
-      width: 60px;
-      height: 2px;
-      background: linear-gradient(90deg, #f59e0b, #eab308, #d97706);
-      margin: 0 auto 20px;
-      border-radius: 2px;
-    }
-
-    /* Mode Toggle Switch */
     .mode-toggle-container {
       display: flex;
       justify-content: center;
@@ -157,7 +145,6 @@ body::before {
       box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
     }
 
-    /* Toggle Container */
     .toggle-container {
       display: flex;
       justify-content: center;
@@ -187,7 +174,6 @@ body::before {
       box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
     }
 
-    /* Gold Calculator Styles */
     .gold-calculator {
       display: block;
     }
@@ -196,11 +182,10 @@ body::before {
       display: none;
       touch-action: manipulation;
       padding: 12px;
-      height: 100vh; /* fallback */
-  height: var(--vh, 100vh); /* use real viewport height if set */
+      height: 100vh;
+      height: var(--vh, 100vh);
     }
 
-    /* Input Cards */
     .input-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -272,7 +257,6 @@ body::before {
       font-size: 13px;
     }
 
-    /* Table Styling - More Compact */
     .table-container {
       position: relative;
       padding: 1.5px;
@@ -316,7 +300,6 @@ body::before {
       padding: 10px 8px;
     }
 
-    /* Table input fields - optimized for mobile */
     .table-input {
       width: 100%;
       padding: 8px 6px;
@@ -346,7 +329,6 @@ body::before {
       font-weight: 600;
     }
 
-    /* Normal Calculator Styles - UPDATED */
     .calculator-display-container {
       background: #1e293b;
       color: white;
@@ -396,7 +378,7 @@ body::before {
 
     .calc-btn {
       touch-action: manipulation;
-  user-select: none;
+      user-select: none;
       padding: 16px 8px;
       border: none;
       border-radius: 10px;
@@ -417,7 +399,7 @@ body::before {
 
     .calc-btn:hover {
       transform: translateY(-2px);
-      transition: transform 0.05s ease; /* fast feedback */
+      transition: transform 0.05s ease;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
@@ -449,7 +431,6 @@ body::before {
       grid-column: span 2;
     }
 
-    /* Action Buttons */
     .action-buttons {
       display: flex;
       justify-content: center;
@@ -458,7 +439,6 @@ body::before {
       flex-wrap: wrap;
     }
 
-/* 🌊 Base Save Button */
 .action-btn {
   display: flex;
   align-items: center;
@@ -483,7 +463,6 @@ body::before {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
 
-/* ✅ Add Button — Deep Mint Gradient */
 .action-btn.add {
   background: linear-gradient(135deg, #0d9488 0%, #14b8a6 60%, #99f6e4 100%);
   color: #fff;
@@ -501,7 +480,6 @@ body::before {
   transform: translateY(-1px);
 }
 
-/* ❌ Remove Button — Rich Professional Red */
 .action-btn.remove {
   background: linear-gradient(135deg, #b91c1c 0%, #dc2626 60%, #fca5a5 100%);
   color: #fff;
@@ -519,7 +497,6 @@ body::before {
   transform: translateY(-1px);
 }
 
-    /* Footer */
     footer {
       text-align: center;
       padding: 20px 16px;
@@ -536,7 +513,6 @@ body::before {
       font-weight: 600;
     }
 
-    /* Animations */
     .fade {
       animation: fadeInOut 0.5s forwards;
     }
@@ -569,7 +545,6 @@ body::before {
       transition: none !important;
     }
 
-    /* History Modal Styles */
     .history-modal {
       display: none;
       position: fixed;
@@ -705,7 +680,6 @@ body::before {
       flex: 1;
     }
 
-    /* Purple gradient for history button */
     .action-btn.history {
       background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 60%, #c4b5fd 100%);
     }
@@ -714,7 +688,6 @@ body::before {
       background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 60%, #a78bfa 100%);
     }
 
-    /* Orange gradient for load button */
     .action-btn.load {
       background: linear-gradient(135deg, #f59e0b 0%, #eab308 60%, #fde68a 100%);
     }
@@ -723,7 +696,6 @@ body::before {
       background: linear-gradient(135deg, #d97706 0%, #f59e0b 60%, #fcd34d 100%);
     }
 
-    /* TOP NOTIFICATION MODAL STYLES */
     .top-notification {
       position: fixed;
       top: 20px;
@@ -818,7 +790,6 @@ body::before {
       box-shadow: 0 6px 12px rgba(107, 114, 128, 0.3);
     }
 
-    /* Success notification styles */
     .top-notification.success .notification-header {
       background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
     }
@@ -827,7 +798,6 @@ body::before {
       animation: bounce 0.8s ease infinite;
     }
 
-    /* Warning notification styles */
     .top-notification.warning .notification-header {
       background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
     }
@@ -836,7 +806,6 @@ body::before {
       animation: pulse 1.5s ease infinite;
     }
 
-    /* Danger notification styles */
     .top-notification.danger .notification-header {
       background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
     }
@@ -845,7 +814,6 @@ body::before {
       animation: shake 0.5s ease infinite;
     }
 
-    /* Info notification styles */
     .top-notification.info .notification-header {
       background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
     }
@@ -854,7 +822,6 @@ body::before {
       animation: float 2s ease-in-out infinite;
     }
 
-    /* Animations */
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-5px); }
@@ -876,7 +843,6 @@ body::before {
       50% { transform: translateY(-3px); }
     }
 
-    /* Enhanced Mobile Responsiveness */
     @media (max-width: 480px) {
       body {
         font-size: 13px;
@@ -1062,7 +1028,6 @@ body::before {
   <!-- Header Section -->
     <div class="header">
       <h1 id="main-title">Gold Calculator</h1>
-      <!--<div class="gold-line"></div>-->
     </div>
 
 <div class="container">
@@ -1083,7 +1048,7 @@ body::before {
     <div id="gold-calculator" class="gold-calculator">
       <!-- Toggle Buttons -->
       <div class="toggle-container">
-        <button class="btn btn-primary" onclick="showClearDataConfirmation()">
+        <button class="btn btn-primary" id="clear-all-btn">
           <i class="fas fa-undo"></i> Clear All
         </button>
       </div>
@@ -1162,22 +1127,22 @@ body::before {
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <button class="action-btn add" onpointerdown="addRow()">
+        <button class="action-btn add" id="add-row-btn">
           <i class="fas fa-plus"></i> Add Row
         </button>
-        <button class="action-btn remove" onpointerdown="removeRow()">
+        <button class="action-btn remove" id="remove-row-btn">
           <i class="fas fa-minus"></i> Remove Row
         </button>
-        <button class="action-btn history" onclick="saveToHistory()">
+        <button class="action-btn history" id="save-history-btn">
           <i class="fas fa-save"></i> Save to History
         </button>
-        <button class="action-btn load" onclick="showHistory()">
+        <button class="action-btn load" id="view-history-btn">
           <i class="fas fa-history"></i> View History
         </button>
-        <button class="action-btn" onclick="takeScreenshotPage()">
+        <button class="action-btn" id="save-page-btn">
           <i class="fas fa-file-alt"></i> Save Page
         </button>
-        <button class="action-btn" onclick="takeScreenshotTable()">
+        <button class="action-btn" id="save-table-btn">
           <i class="fas fa-table"></i> Save Table
         </button>
       </div>
@@ -1188,16 +1153,16 @@ body::before {
       <div class="history-content">
         <div class="history-header">
           <h2><i class="fas fa-history"></i> Calculation History</h2>
-          <button class="close-history" onclick="hideHistory()">&times;</button>
+          <button class="close-history" id="close-history-btn">&times;</button>
         </div>
         <div class="history-list" id="history-list">
           <!-- History items will be loaded here -->
         </div>
         <div class="history-actions">
-          <button class="action-btn remove" onclick="showClearHistoryConfirmation()">
+          <button class="action-btn remove" id="clear-history-btn">
             <i class="fas fa-trash"></i> Clear All History
           </button>
-          <button class="action-btn" onclick="hideHistory()">
+          <button class="action-btn" id="close-modal-btn">
             <i class="fas fa-times"></i> Close
           </button>
         </div>
@@ -1212,29 +1177,29 @@ body::before {
       </div>
       
       <div class="calculator-buttons">
-        <button class="calc-btn clear" onpointerdown="clearCalculator()">AC</button>
-        <button class="calc-btn backspace" onpointerdown="backspace()">⌫</button>
-        <button class="calc-btn" onpointerdown="handlePercentage()">%</button>
-        <button class="calc-btn operator" onpointerdown="handleOperation('/')">÷</button>
+        <button class="calc-btn clear" id="calc-ac">AC</button>
+        <button class="calc-btn backspace" id="calc-backspace">⌫</button>
+        <button class="calc-btn" id="calc-percent">%</button>
+        <button class="calc-btn operator" id="calc-divide">÷</button>
         
-        <button class="calc-btn" onpointerdown="appendToDisplay('7')">7</button>
-        <button class="calc-btn" onpointerdown="appendToDisplay('8')">8</button>
-        <button class="calc-btn" onpointerdown="appendToDisplay('9')">9</button>
-        <button class="calc-btn operator" onpointerdown="handleOperation('*')">×</button>
+        <button class="calc-btn" id="calc-7">7</button>
+        <button class="calc-btn" id="calc-8">8</button>
+        <button class="calc-btn" id="calc-9">9</button>
+        <button class="calc-btn operator" id="calc-multiply">×</button>
         
-        <button class="calc-btn" onpointerdown="appendToDisplay('4')">4</button>
-        <button class="calc-btn" onpointerdown="appendToDisplay('5')">5</button>
-        <button class="calc-btn" onpointerdown="appendToDisplay('6')">6</button>
-        <button class="calc-btn operator" onpointerdown="handleOperation('-')">−</button>
+        <button class="calc-btn" id="calc-4">4</button>
+        <button class="calc-btn" id="calc-5">5</button>
+        <button class="calc-btn" id="calc-6">6</button>
+        <button class="calc-btn operator" id="calc-subtract">−</button>
         
-        <button class="calc-btn" onpointerdown="appendToDisplay('1')">1</button>
-        <button class="calc-btn" onpointerdown="appendToDisplay('2')">2</button>
-        <button class="calc-btn" onpointerdown="appendToDisplay('3')">3</button>
-        <button class="calc-btn operator" onpointerdown="handleOperation('+')">+</button>
+        <button class="calc-btn" id="calc-1">1</button>
+        <button class="calc-btn" id="calc-2">2</button>
+        <button class="calc-btn" id="calc-3">3</button>
+        <button class="calc-btn operator" id="calc-add">+</button>
         
-        <button class="calc-btn zero" onpointerdown="appendToDisplay('0')">0</button>
-        <button class="calc-btn" onpointerdown="appendToDisplay('.')">.</button>
-        <button class="calc-btn equals" onpointerdown="calculateResult()">=</button>
+        <button class="calc-btn zero" id="calc-0">0</button>
+        <button class="calc-btn" id="calc-decimal">.</button>
+        <button class="calc-btn equals" id="calc-equals">=</button>
       </div>
     </div>
 
@@ -1248,30 +1213,140 @@ body::before {
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-    // Prevent double-tap zoom on mobile
-    document.addEventListener('touchstart', function(event) {
-      if (event.touches.length > 1) {
-        event.preventDefault();
-      }
-    }, { passive: false });
-
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function(event) {
-      const now = (new Date()).getTime();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
-
-    // Prevent context menu on long press
-    document.addEventListener('contextmenu', function(event) {
-      event.preventDefault();
-    });
-
-    // Mode switching functionality
+    // ===============================
+    // INITIALIZATION AND VARIABLES
+    // ===============================
     let currentMode = 'gold';
+    let currentInput = '0';
+    let isNewCalculation = true;
+    let lastResult = null;
+    let draftSaveTimeout = null;
+    let isRestoringDraft = false;
+    
+    const DRAFT_KEY = 'goldCalculatorDraft';
+    const HISTORY_KEY = 'goldCalculatorHistory';
+    const MAX_HISTORY_ITEMS = 50;
 
+    // ===============================
+    // DOM ELEMENT REFERENCES
+    // ===============================
+    const elements = {
+      // Main containers
+      goldCalculator: document.getElementById('gold-calculator'),
+      normalCalculator: document.getElementById('normal-calculator'),
+      historyModal: document.getElementById('history-modal'),
+      historyList: document.getElementById('history-list'),
+      notificationContainer: document.getElementById('notification-container'),
+      
+      // Input fields
+      targetPurity: document.getElementById('target-purity'),
+      availablePurity: document.getElementById('available-purity'),
+      weightNeeded: document.getElementById('weight-needed'),
+      copperNeeded: document.getElementById('copper-needed'),
+      totalWeight: document.getElementById('total-weight'),
+      totalNet: document.getElementById('total-net'),
+      avgPurity: document.getElementById('avg-purity'),
+      dataRows: document.getElementById('data-rows'),
+      
+      // Calculator display
+      currentInput: document.getElementById('current-input'),
+      liveResult: document.getElementById('live-result'),
+      
+      // Buttons
+      clearAllBtn: document.getElementById('clear-all-btn'),
+      addRowBtn: document.getElementById('add-row-btn'),
+      removeRowBtn: document.getElementById('remove-row-btn'),
+      saveHistoryBtn: document.getElementById('save-history-btn'),
+      viewHistoryBtn: document.getElementById('view-history-btn'),
+      savePageBtn: document.getElementById('save-page-btn'),
+      saveTableBtn: document.getElementById('save-table-btn'),
+      clearHistoryBtn: document.getElementById('clear-history-btn'),
+      closeHistoryBtn: document.getElementById('close-history-btn'),
+      closeModalBtn: document.getElementById('close-modal-btn')
+    };
+
+    // ===============================
+    // EVENT LISTENERS SETUP
+    // ===============================
+    function setupEventListeners() {
+      // Gold calculator buttons
+      elements.clearAllBtn.addEventListener('click', showClearDataConfirmation);
+      elements.addRowBtn.addEventListener('click', addRow);
+      elements.removeRowBtn.addEventListener('click', removeRow);
+      elements.saveHistoryBtn.addEventListener('click', saveToHistory);
+      elements.viewHistoryBtn.addEventListener('click', showHistory);
+      elements.savePageBtn.addEventListener('click', takeScreenshotPage);
+      elements.saveTableBtn.addEventListener('click', takeScreenshotTable);
+      elements.clearHistoryBtn.addEventListener('click', showClearHistoryConfirmation);
+      elements.closeHistoryBtn.addEventListener('click', hideHistory);
+      elements.closeModalBtn.addEventListener('click', hideHistory);
+      
+      // History modal close on outside click
+      elements.historyModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          hideHistory();
+        }
+      });
+      
+      // Normal calculator buttons
+      setupCalculatorButtons();
+    }
+
+    function setupCalculatorButtons() {
+      // Clear
+      document.getElementById('calc-ac').addEventListener('click', clearCalculator);
+      document.getElementById('calc-backspace').addEventListener('click', backspace);
+      document.getElementById('calc-percent').addEventListener('click', handlePercentage);
+      
+      // Operators
+      document.getElementById('calc-divide').addEventListener('click', () => handleOperation('/'));
+      document.getElementById('calc-multiply').addEventListener('click', () => handleOperation('*'));
+      document.getElementById('calc-subtract').addEventListener('click', () => handleOperation('-'));
+      document.getElementById('calc-add').addEventListener('click', () => handleOperation('+'));
+      document.getElementById('calc-equals').addEventListener('click', calculateResult);
+      
+      // Numbers
+      document.getElementById('calc-0').addEventListener('click', () => appendToDisplay('0'));
+      document.getElementById('calc-1').addEventListener('click', () => appendToDisplay('1'));
+      document.getElementById('calc-2').addEventListener('click', () => appendToDisplay('2'));
+      document.getElementById('calc-3').addEventListener('click', () => appendToDisplay('3'));
+      document.getElementById('calc-4').addEventListener('click', () => appendToDisplay('4'));
+      document.getElementById('calc-5').addEventListener('click', () => appendToDisplay('5'));
+      document.getElementById('calc-6').addEventListener('click', () => appendToDisplay('6'));
+      document.getElementById('calc-7').addEventListener('click', () => appendToDisplay('7'));
+      document.getElementById('calc-8').addEventListener('click', () => appendToDisplay('8'));
+      document.getElementById('calc-9').addEventListener('click', () => appendToDisplay('9'));
+      document.getElementById('calc-decimal').addEventListener('click', () => appendToDisplay('.'));
+    }
+
+    // ===============================
+    // INITIALIZATION FUNCTIONS
+    // ===============================
+    function init() {
+      // Add 3 initial rows
+      for (let i = 0; i < 3; i++) addRow();
+      
+      // Setup event listeners
+      setupEventListeners();
+      
+      // Restore draft
+      restoreDraft();
+      
+      // Initialize calculator display
+      updateDisplay();
+      
+      // Set viewport height
+      setViewportHeight();
+      window.addEventListener('resize', setViewportHeight);
+    }
+
+    function setViewportHeight() {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
+    }
+
+    // ===============================
+    // MODE SWITCHING
+    // ===============================
     function switchMode(mode) {
       currentMode = mode;
       
@@ -1286,20 +1361,13 @@ body::before {
         mode === 'gold' ? 'Gold Calculator' : 'Normal Calculator';
       
       // Show/hide calculators
-      document.getElementById('gold-calculator').style.display = 
-        mode === 'gold' ? 'block' : 'none';
-      document.getElementById('normal-calculator').style.display = 
-        mode === 'gold' ? 'none' : 'block';
+      elements.goldCalculator.style.display = mode === 'gold' ? 'block' : 'none';
+      elements.normalCalculator.style.display = mode === 'gold' ? 'none' : 'block';
     }
 
     // ===============================
     // AUTO-SAVE DRAFT SYSTEM
     // ===============================
-    const DRAFT_KEY = 'goldCalculatorDraft';
-    let draftSaveTimeout = null;
-    let isRestoringDraft = false;
-
-    // Debounced function to save draft
     function saveDraft() {
       if (isRestoringDraft) return;
       
@@ -1309,13 +1377,13 @@ body::before {
       
       draftSaveTimeout = setTimeout(() => {
         // Get current calculation data
-        const targetPurity = document.getElementById('target-purity').value;
-        const availablePurity = document.getElementById('available-purity').value;
-        const weightNeeded = document.getElementById('weight-needed').value;
-        const copperNeeded = document.getElementById('copper-needed').value;
-        const totalWeight = document.getElementById('total-weight').value;
-        const totalNet = document.getElementById('total-net').value;
-        const avgPurity = document.getElementById('avg-purity').value;
+        const targetPurity = elements.targetPurity.value;
+        const availablePurity = elements.availablePurity.value;
+        const weightNeeded = elements.weightNeeded.value;
+        const copperNeeded = elements.copperNeeded.value;
+        const totalWeight = elements.totalWeight.value;
+        const totalNet = elements.totalNet.value;
+        const avgPurity = elements.avgPurity.value;
 
         // Get table data
         const tableData = [];
@@ -1344,37 +1412,29 @@ body::before {
 
         // Save to localStorage
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-      }, 1000); // 1 second debounce
+      }, 1000);
     }
 
-    // Restore draft on page load
     function restoreDraft() {
       isRestoringDraft = true;
       
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
-      
-      // Always start with 3 rows if there are no rows
-      const tableBody = document.getElementById("data-rows");
-      if (tableBody.rows.length === 0) {
-        for (let i = 0; i < 3; i++) addRow();
-      }
-
       if (!draft) {
         isRestoringDraft = false;
         return;
       }
 
       // Load the data into the calculator
-      document.getElementById('target-purity').value = draft.targetPurity || '';
-      document.getElementById('available-purity').value = draft.availablePurity || '';
-      document.getElementById('weight-needed').value = draft.weightNeeded || '';
-      document.getElementById('copper-needed').value = draft.copperNeeded || '';
-      document.getElementById('total-weight').value = draft.totalWeight || '';
-      document.getElementById('total-net').value = draft.totalNet || '';
-      document.getElementById('avg-purity').value = draft.avgPurity || '';
+      elements.targetPurity.value = draft.targetPurity || '';
+      elements.availablePurity.value = draft.availablePurity || '';
+      elements.weightNeeded.value = draft.weightNeeded || '';
+      elements.copperNeeded.value = draft.copperNeeded || '';
+      elements.totalWeight.value = draft.totalWeight || '';
+      elements.totalNet.value = draft.totalNet || '';
+      elements.avgPurity.value = draft.avgPurity || '';
 
       // Clear existing rows
-      tableBody.innerHTML = '';
+      elements.dataRows.innerHTML = '';
 
       // Add rows from draft
       if (draft.tableData && draft.tableData.length > 0) {
@@ -1398,11 +1458,8 @@ body::before {
                      value="${rowData.net || ''}" readonly />
             </td>
           `;
-          tableBody.appendChild(row);
+          elements.dataRows.appendChild(row);
         });
-      } else {
-        // Add 3 empty rows
-        for (let i = 0; i < 3; i++) addRow();
       }
 
       // Recalculate
@@ -1412,22 +1469,124 @@ body::before {
       isRestoringDraft = false;
     }
 
-    // Clear draft
     function clearDraft() {
       localStorage.removeItem(DRAFT_KEY);
     }
 
-    // Handler for input changes to trigger auto-save
+    // ===============================
+    // GOLD CALCULATOR FUNCTIONS
+    // ===============================
+    function addRow() {
+      const tableBody = elements.dataRows;
+      const rowCount = tableBody.rows.length;
+      const row = document.createElement("tr");
+
+      row.classList.add('slide-right');
+      row.innerHTML = `
+       <td>
+          <input type="number" inputmode="decimal" class="table-input purity" id="purity-${rowCount + 1}" 
+                 step="0.1" oninput="handleInputChange()" 
+                 onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"
+                 placeholder="0.0" />
+        </td>
+        <td>
+          <input type="number" inputmode="decimal" class="table-input weight" id="weight-${rowCount + 1}" 
+                 step="0.01" oninput="handleInputChange()" 
+                 onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"
+                 placeholder="0.00" />
+        </td>
+        <td>
+          <input type="number" inputmode="decimal" class="table-input result net" readonly />
+        </td>
+      `;
+      tableBody.appendChild(row);
+      
+      // Auto-save after adding row
+      saveDraft();
+    }
+
+    function removeRow() {
+      const tableBody = elements.dataRows;
+      if (tableBody.rows.length > 0) {
+        const row = tableBody.rows[tableBody.rows.length - 1];
+        row.classList.add('slide-left');
+        row.addEventListener('animationend', () => {
+          row.remove();
+          calculateNetWeight();
+          calculateWeightNeeded();
+          saveDraft();
+        });
+      }
+    }
+
+    function calculateNetWeight() {
+      const weights = document.querySelectorAll('.weight');
+      const purities = document.querySelectorAll('.purity');
+      const nets = document.querySelectorAll('.net');
+
+      let totalWeight = 0;
+      let totalNet = 0;
+
+      for (let i = 0; i < weights.length; i++) {
+        const weight = parseFloat(weights[i].value) || 0;
+        const purity = parseFloat(purities[i].value) || 0;
+        const net = weight * purity / 999;
+        nets[i].value = net.toFixed(2);
+        totalWeight += weight;
+        totalNet += net;
+      }
+
+      elements.totalWeight.value = totalWeight.toFixed(2);
+      elements.totalNet.value = totalNet.toFixed(2);
+      if (totalWeight > 0) {
+        const avgPurity = (totalNet / totalWeight) * 999;
+        elements.avgPurity.value = avgPurity.toFixed(1);
+      } else {
+        elements.avgPurity.value = '';
+      }
+
+      calculateWeightNeeded();
+    }
+
+    function calculateWeightNeeded() {
+      const W1 = parseFloat(elements.totalWeight.value);
+      const P1 = parseFloat(elements.avgPurity.value);
+      const Pt = parseFloat(elements.targetPurity.value);
+      const P2 = parseFloat(elements.availablePurity.value);
+
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && !isNaN(P2) && P2 !== Pt) {
+        const W2 = (W1 * (Pt - P1)) / (P2 - Pt);
+        elements.weightNeeded.value = W2 > 0 ? W2.toFixed(2) : '0.00';
+      } else {
+        elements.weightNeeded.value = '';
+      }
+
+      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && Pt !== 0) {
+        const copperW = (W1 * (P1 - Pt)) / Pt;
+        elements.copperNeeded.value = copperW > 0 ? copperW.toFixed(2) : '0.00';
+      } else {
+        elements.copperNeeded.value = '';
+      }
+    }
+
     function handleInputChange() {
       calculateWeightNeeded();
       saveDraft();
     }
 
+    function moveFocus(e, nextId) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const nextElement = document.getElementById(nextId);
+        if (nextElement) nextElement.focus();
+      }
+    }
+
     // ===============================
-    // TOP NOTIFICATION SYSTEM
+    // NOTIFICATION SYSTEM
     // ===============================
     function showNotification(type, title, message, options = {}) {
-      const container = document.getElementById('notification-container');
+      const container = elements.notificationContainer;
       const id = 'notification-' + Date.now();
       
       let buttonsHtml = '';
@@ -1435,7 +1594,7 @@ body::before {
         buttonsHtml = `
           <div class="notification-actions">
             ${options.buttons.map(btn => `
-              <button class="notification-btn ${btn.type}" onclick="${btn.onclick}">
+              <button class="notification-btn ${btn.type}" data-action="${btn.action}" data-notification-id="${id}">
                 <i class="${btn.icon}"></i> ${btn.text}
               </button>
             `).join('')}
@@ -1500,71 +1659,75 @@ body::before {
         }, 300);
       }
     }
-    
-    function showSuccessSave() {
-      showNotification('success', 'Success!', 'Calculation saved to history!', {
-        duration: 2500
-      });
-    }
-    
-    function showSuccessLoad() {
-      showNotification('success', 'Loaded!', 'Calculation loaded successfully!', {
-        duration: 2500
-      });
-    }
-    
-    // Show Clear Data Confirmation
+
+    // Event delegation for notification buttons
+    elements.notificationContainer.addEventListener('click', function(e) {
+      const button = e.target.closest('.notification-btn');
+      if (button) {
+        const action = button.getAttribute('data-action');
+        const notificationId = button.getAttribute('data-notification-id');
+        
+        if (action === 'clearAllData') {
+          performClearAllData();
+          hideNotification(notificationId);
+        } else if (action === 'clearHistory') {
+          performClearHistory();
+          hideNotification(notificationId);
+        } else if (action === 'cancel') {
+          hideNotification(notificationId);
+        }
+      }
+    });
+
     function showClearDataConfirmation() {
-      const id = showNotification('warning', 'Clear All Data', 'Are you sure you want to clear all calculation data? This will clear all input values but keep the table rows.', {
+      showNotification('warning', 'Clear All Data', 'Are you sure you want to clear all calculation data? This will clear all input values.', {
         buttons: [
           {
             text: 'Yes, Clear All',
             type: 'confirm',
             icon: 'fas fa-check',
-            onclick: `performClearAllData('${id}')`
+            action: 'clearAllData'
           },
           {
             text: 'Cancel',
             type: 'cancel',
             icon: 'fas fa-times',
-            onclick: `hideNotification('${id}')`
+            action: 'cancel'
           }
         ],
         persistent: true
       });
     }
-    
-    // Show Clear History Confirmation
+
     function showClearHistoryConfirmation() {
-      const id = showNotification('danger', 'Clear All History', 'Are you sure you want to clear ALL calculation history? This action cannot be undone.', {
+      showNotification('danger', 'Clear All History', 'Are you sure you want to clear ALL calculation history? This action cannot be undone.', {
         buttons: [
           {
             text: 'Yes, Delete All',
             type: 'cancel',
             icon: 'fas fa-trash',
-            onclick: `performClearHistory('${id}')`
+            action: 'clearHistory'
           },
           {
             text: 'Cancel',
             type: 'neutral',
             icon: 'fas fa-times',
-            onclick: `hideNotification('${id}')`
+            action: 'cancel'
           }
         ],
         persistent: true
       });
     }
-    
-    // Perform clear all data
-    function performClearAllData(notificationId) {
+
+    function performClearAllData() {
       // Clear all input fields
-      document.getElementById('target-purity').value = '';
-      document.getElementById('available-purity').value = '';
-      document.getElementById('weight-needed').value = '';
-      document.getElementById('copper-needed').value = '';
-      document.getElementById('total-weight').value = '';
-      document.getElementById('total-net').value = '';
-      document.getElementById('avg-purity').value = '';
+      elements.targetPurity.value = '';
+      elements.availablePurity.value = '';
+      elements.weightNeeded.value = '';
+      elements.copperNeeded.value = '';
+      elements.totalWeight.value = '';
+      elements.totalNet.value = '';
+      elements.avgPurity.value = '';
       
       // Clear all table inputs but keep rows
       document.querySelectorAll('.weight, .purity').forEach(input => input.value = '');
@@ -1577,9 +1740,6 @@ body::before {
       calculateNetWeight();
       calculateWeightNeeded();
       
-      // Hide the confirmation notification
-      hideNotification(notificationId);
-      
       // Show success notification
       setTimeout(() => {
         showNotification('success', 'Cleared!', 'All calculation data has been cleared.', {
@@ -1588,18 +1748,14 @@ body::before {
       }, 350);
     }
     
-    // Perform clear history
-    function performClearHistory(notificationId) {
+    function performClearHistory() {
       // Clear history from localStorage
       localStorage.removeItem(HISTORY_KEY);
       
       // Refresh history list if modal is open
-      if (document.getElementById('history-modal').classList.contains('active')) {
+      if (elements.historyModal.classList.contains('active')) {
         showHistory();
       }
-      
-      // Hide the confirmation notification
-      hideNotification(notificationId);
       
       // Show success notification
       setTimeout(() => {
@@ -1610,20 +1766,17 @@ body::before {
     }
 
     // ===============================
-    // HISTORY MANAGEMENT FUNCTIONS
+    // HISTORY MANAGEMENT
     // ===============================
-    const HISTORY_KEY = 'goldCalculatorHistory';
-    const MAX_HISTORY_ITEMS = 50;
-
     function saveToHistory() {
       // Get current calculation data
-      const targetPurity = document.getElementById('target-purity').value;
-      const availablePurity = document.getElementById('available-purity').value;
-      const weightNeeded = document.getElementById('weight-needed').value;
-      const copperNeeded = document.getElementById('copper-needed').value;
-      const totalWeight = document.getElementById('total-weight').value;
-      const totalNet = document.getElementById('total-net').value;
-      const avgPurity = document.getElementById('avg-purity').value;
+      const targetPurity = elements.targetPurity.value;
+      const availablePurity = elements.availablePurity.value;
+      const weightNeeded = elements.weightNeeded.value;
+      const copperNeeded = elements.copperNeeded.value;
+      const totalWeight = elements.totalWeight.value;
+      const totalNet = elements.totalNet.value;
+      const avgPurity = elements.avgPurity.value;
 
       // Get table data
       const tableData = [];
@@ -1667,18 +1820,16 @@ body::before {
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 
       // Show success notification
-      showSuccessSave();
+      showNotification('success', 'Success!', 'Calculation saved to history!', {
+        duration: 2500
+      });
     }
 
     function showHistory() {
-      const modal = document.getElementById('history-modal');
-      const historyList = document.getElementById('history-list');
-      
-      // Load history from localStorage
       const history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
       
       if (history.length === 0) {
-        historyList.innerHTML = `
+        elements.historyList.innerHTML = `
           <div class="history-item-empty">
             <i class="fas fa-history" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;"></i>
             <p>No calculation history yet</p>
@@ -1686,7 +1837,7 @@ body::before {
           </div>
         `;
       } else {
-        historyList.innerHTML = history.map(item => `
+        elements.historyList.innerHTML = history.map(item => `
           <div class="history-item" data-id="${item.id}">
             <div class="history-item-header">
               <span class="history-item-date">${item.date}</span>
@@ -1729,18 +1880,18 @@ body::before {
         `).join('');
       }
       
-      modal.classList.add('active');
+      elements.historyModal.classList.add('active');
     }
 
     function hideHistory() {
-      document.getElementById('history-modal').classList.remove('active');
+      elements.historyModal.classList.remove('active');
     }
 
     function deleteHistoryItem(id) {
       let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
       history = history.filter(item => item.id !== id);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-      showHistory(); // Refresh the list
+      showHistory();
     }
 
     function loadHistoryItem(id) {
@@ -1755,17 +1906,16 @@ body::before {
       }
 
       // Load the data into the calculator
-      document.getElementById('target-purity').value = item.targetPurity || '';
-      document.getElementById('available-purity').value = item.availablePurity || '';
-      document.getElementById('weight-needed').value = item.weightNeeded || '';
-      document.getElementById('copper-needed').value = item.copperNeeded || '';
-      document.getElementById('total-weight').value = item.totalWeight || '';
-      document.getElementById('total-net').value = item.totalNet || '';
-      document.getElementById('avg-purity').value = item.avgPurity || '';
+      elements.targetPurity.value = item.targetPurity || '';
+      elements.availablePurity.value = item.availablePurity || '';
+      elements.weightNeeded.value = item.weightNeeded || '';
+      elements.copperNeeded.value = item.copperNeeded || '';
+      elements.totalWeight.value = item.totalWeight || '';
+      elements.totalNet.value = item.totalNet || '';
+      elements.avgPurity.value = item.avgPurity || '';
 
       // Clear existing rows
-      const tableBody = document.getElementById("data-rows");
-      tableBody.innerHTML = '';
+      elements.dataRows.innerHTML = '';
 
       // Add rows from history
       if (item.tableData && item.tableData.length > 0) {
@@ -1789,11 +1939,8 @@ body::before {
                      value="${rowData.net || ''}" readonly />
             </td>
           `;
-          tableBody.appendChild(row);
+          elements.dataRows.appendChild(row);
         });
-      } else {
-        // Add 3 empty rows
-        for (let i = 0; i < 3; i++) addRow();
       }
 
       // Recalculate
@@ -1807,150 +1954,43 @@ body::before {
       hideHistory();
       
       // Show success notification
-      showSuccessLoad();
-    }
-
-    // ===============================
-    // GOLD CALCULATOR FUNCTIONS
-    // ===============================
-    function addRow() {
-      const tableBody = document.getElementById("data-rows");
-      const rowCount = tableBody.rows.length;
-      const row = document.createElement("tr");
-
-      row.classList.add('slide-right');
-      row.innerHTML = `
-       <td>
-          <input type="number" inputmode="decimal" class="table-input purity" id="purity-${rowCount + 1}" 
-                 step="0.1" oninput="handleInputChange()" 
-                 onkeydown="moveFocus(event, 'weight-${rowCount + 2}')"
-                 placeholder="0.0" />
-        </td>
-        <td>
-          <input type="number" inputmode="decimal" class="table-input weight" id="weight-${rowCount + 1}" 
-                 step="0.01" oninput="handleInputChange()" 
-                 onkeydown="moveFocus(event, 'purity-${rowCount + 1}')"
-                 placeholder="0.00" />
-        </td>
-        <td>
-          <input type="number" inputmode="decimal" class="table-input result net" readonly />
-        </td>
-      `;
-      tableBody.appendChild(row);
-      
-      // Auto-save after adding row
-      saveDraft();
-    }
-
-    function removeRow() {
-      const tableBody = document.getElementById("data-rows");
-      if (tableBody.rows.length > 0) {
-        const row = tableBody.rows[tableBody.rows.length - 1];
-        row.classList.add('slide-left');
-        row.addEventListener('animationend', () => {
-          row.remove();
-          calculateNetWeight();
-          calculateWeightNeeded();
-          // Auto-save after removing row
-          saveDraft();
-        });
-      }
-    }
-
-    function calculateNetWeight() {
-      const weights = document.querySelectorAll('.weight');
-      const purities = document.querySelectorAll('.purity');
-      const nets = document.querySelectorAll('.net');
-
-      let totalWeight = 0;
-      let totalNet = 0;
-
-      for (let i = 0; i < weights.length; i++) {
-        const weight = parseFloat(weights[i].value) || 0;
-        const purity = parseFloat(purities[i].value) || 0;
-        const net = weight * purity / 999;
-        nets[i].value = net.toFixed(2);
-        totalWeight += weight;
-        totalNet += net;
-      }
-
-      document.getElementById('total-weight').value = totalWeight.toFixed(2);
-      document.getElementById('total-net').value = totalNet.toFixed(2);
-      if (totalWeight > 0) {
-        const avgPurity = (totalNet / totalWeight) * 999;
-        document.getElementById('avg-purity').value = avgPurity.toFixed(1);
-      } else {
-        document.getElementById('avg-purity').value = '';
-      }
-
-      calculateWeightNeeded();
-    }
-
-    function calculateWeightNeeded() {
-      const W1 = parseFloat(document.getElementById('total-weight').value);
-      const P1 = parseFloat(document.getElementById('avg-purity').value);
-      const Pt = parseFloat(document.getElementById('target-purity').value);
-      const P2 = parseFloat(document.getElementById('available-purity').value);
-
-      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && !isNaN(P2) && P2 !== Pt) {
-        const W2 = (W1 * (Pt - P1)) / (P2 - Pt);
-        document.getElementById('weight-needed').value = W2 > 0 ? W2.toFixed(2) : '0.00';
-      } else {
-        document.getElementById('weight-needed').value = '';
-      }
-
-      if (!isNaN(W1) && !isNaN(P1) && !isNaN(Pt) && Pt !== 0) {
-        const copperW = (W1 * (P1 - Pt)) / Pt;
-        document.getElementById('copper-needed').value = copperW > 0 ? copperW.toFixed(2) : '0.00';
-      } else {
-        document.getElementById('copper-needed').value = '';
-      }
+      showNotification('success', 'Loaded!', 'Calculation loaded successfully!', {
+        duration: 2500
+      });
     }
 
     // ===============================
     // NORMAL CALCULATOR FUNCTIONS
     // ===============================
-    let currentInput = '0';
-    let isNewCalculation = true;
-    let lastResult = null;
-
     function updateDisplay() {
-      const currentInputElement = document.getElementById('current-input');
-      const liveResultElement = document.getElementById('live-result');
+      elements.currentInput.textContent = currentInput;
       
-      // Update current input line
-      currentInputElement.textContent = currentInput;
-      
-      // Calculate and show live result
       if (!isNewCalculation) {
         try {
           const result = evaluateExpression(currentInput);
           if (!isNaN(result) && isFinite(result)) {
-            liveResultElement.textContent = '= ' + formatNumber(result);
+            elements.liveResult.textContent = '= ' + formatNumber(result);
             lastResult = result;
           } else {
-            liveResultElement.textContent = '';
+            elements.liveResult.textContent = '';
           }
         } catch (e) {
-          liveResultElement.textContent = '';
+          elements.liveResult.textContent = '';
         }
       } else {
-        liveResultElement.textContent = '';
+        elements.liveResult.textContent = '';
       }
     }
 
     function appendToDisplay(value) {
       if (isNewCalculation) {
-        // If we have a previous result and user types a number, start fresh
         if (lastResult !== null && /[0-9]/.test(value)) {
           currentInput = value;
         } else {
-          // If user types after result, continue from result
           currentInput = lastResult !== null ? lastResult.toString() + value : value;
         }
         isNewCalculation = false;
       } else {
-        // Prevent multiple decimal points in a number
         if (value === '.' && currentInput.split(/[\+\-\*\/]/).pop().includes('.')) {
           return;
         }
@@ -1983,14 +2023,12 @@ body::before {
 
     function handleOperation(op) {
       if (isNewCalculation && lastResult !== null) {
-        // Continue from previous result with new operator
         currentInput = lastResult.toString() + op;
         isNewCalculation = false;
       } else if (isNewCalculation) {
         currentInput = '0' + op;
         isNewCalculation = false;
       } else {
-        // Check if last character is an operator, replace it
         const lastChar = currentInput.slice(-1);
         if (['+', '-', '*', '/'].includes(lastChar)) {
           currentInput = currentInput.slice(0, -1) + op;
@@ -2008,7 +2046,6 @@ body::before {
         const result = evaluateExpression(currentInput);
         const formattedResult = formatNumber(result);
         
-        // Store result and set as current input
         lastResult = result;
         currentInput = formattedResult;
         isNewCalculation = true;
@@ -2026,7 +2063,6 @@ body::before {
       if (isNewCalculation) return;
       
       try {
-        // Calculate percentage of the current expression
         const result = evaluateExpression(currentInput);
         const percentageResult = result / 100;
         currentInput = formatNumber(percentageResult);
@@ -2042,10 +2078,7 @@ body::before {
     }
 
     function evaluateExpression(expr) {
-      // Replace display operators with JavaScript operators
       expr = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
-      
-      // Remove any trailing operators
       expr = expr.replace(/[\+\-\*\/]$/, '');
       
       try {
@@ -2060,36 +2093,28 @@ body::before {
     }
 
     function formatNumber(num) {
-      // Handle very small numbers
       if (Math.abs(num) < 0.000001 && num !== 0) {
         return num.toExponential(6);
       }
       
-      // Format regular numbers
       if (num % 1 === 0) {
         return num.toString();
       } else {
-        // Remove trailing zeros
         return parseFloat(num.toFixed(10)).toString();
       }
     }
 
-    // Initialize calculator display
-    updateDisplay();
-
     // ===============================
-    // COMMON FUNCTIONS
+    // SCREENSHOT FUNCTIONS
     // ===============================
     async function takeScreenshotPage() {
       document.body.classList.add('no-animations');
       
-      // Add temporary spacing if content is too short
       const originalContainerStyle = document.querySelector('.container').style.minHeight;
       const isContentShort = document.body.scrollHeight < window.innerHeight * 0.8;
       
       if (isContentShort) {
         document.querySelector('.container').style.minHeight = '70vh';
-        // Force reflow
         await new Promise(resolve => setTimeout(resolve, 50));
       }
       
@@ -2121,7 +2146,6 @@ body::before {
         console.error('Screenshot failed:', error);
         alert('Failed to capture screenshot. Please try again.');
       } finally {
-        // Restore original styles
         document.querySelector('.container').style.minHeight = originalContainerStyle;
         document.body.classList.remove('no-animations');
       }
@@ -2153,79 +2177,44 @@ body::before {
       document.body.classList.remove('no-animations');
     }
 
-    function moveFocus(e, nextId) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const nextElement = document.getElementById(nextId);
-        if (nextElement) nextElement.focus();
-      }
-    }
-
-    // Close history modal when clicking outside
-    document.getElementById('history-modal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        hideHistory();
-      }
-    });
+    // ===============================
+    // INITIALIZE APP
+    // ===============================
+    document.addEventListener('DOMContentLoaded', init);
 
     // ===============================
-    // INITIALIZATION
+    // TRACKING CODE (Keep as is)
     // ===============================
-    // Restore draft on page load
-    window.addEventListener('DOMContentLoaded', function() {
-      restoreDraft();
-    });
+    (async () => {
+      const lastPage = localStorage.getItem("lastPage") || "";
+      localStorage.setItem("lastPage", location.href);
 
-    // Initialize with 3 rows if empty
-    document.addEventListener('DOMContentLoaded', function() {
-      const tableBody = document.getElementById("data-rows");
-      if (tableBody.rows.length === 0) {
-        for (let i = 0; i < 3; i++) addRow();
+      const data = {
+        page: location.href,
+        site: "Gold Calculator",
+        screenWidth: screen.width,
+        screenHeight: screen.height,
+        pixelRatio: devicePixelRatio,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        language: navigator.language,
+        referrer: document.referrer || lastPage || "",
+        browser: navigator.userAgent,
+        os: navigator.platform,
+        device: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+      };
+
+      try {
+        await fetch("https://website-tracker-x2s1.onrender.com/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+      } catch (err) {
+        console.error("Tracking failed:", err);
       }
-    });
+    })();
 
   </script>
-  <script>
-function setViewportHeight() {
-  document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
-}
-setViewportHeight();
-window.addEventListener('resize', setViewportHeight);
-</script>
-
-  <script>
-(async () => {
-  // Save current page as lastPage for future visits
-  const lastPage = localStorage.getItem("lastPage") || "";
-  localStorage.setItem("lastPage", location.href);
-
-  const data = {
-    page: location.href,
-    site: "Gold Calculator",
-    screenWidth: screen.width,
-    screenHeight: screen.height,
-    pixelRatio: devicePixelRatio,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    language: navigator.language,
-    // Use document.referrer or lastPage in localStorage
-    referrer: document.referrer || lastPage || "",
-
-    browser: navigator.userAgent,
-    os: navigator.platform,
-    device: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
-  };
-
-  try {
-    await fetch("https://website-tracker-x2s1.onrender.com/track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-  } catch (err) {
-    console.error("Tracking failed:", err);
-  }
-})();
-</script>
   
 </body>
 </html>
